@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Trinity/Core/Core.h"
+#include "Trinity/Vulkan/VulkanContext.h"
 
 namespace Trinity
 {
@@ -21,7 +22,7 @@ namespace Trinity
     public:
         Application() = default;
         Application(const ApplicationSpecification& specification);
-        virtual ~Application() = default;
+        virtual ~Application();
 
         virtual void Run()
         {
@@ -30,5 +31,6 @@ namespace Trinity
 
     protected:
         ApplicationSpecification m_Specification;
+        std::unique_ptr<VulkanContext> m_VulkanContext;
     };
 }
