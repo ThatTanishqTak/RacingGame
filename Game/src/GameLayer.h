@@ -1,1 +1,0 @@
-#include "Trinity/Core/Entrypoint.h"

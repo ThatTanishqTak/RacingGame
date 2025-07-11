@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(MSVC)
 	add_compile_options(/MP)
+	add_compile_options(/utf-8)
 endif()
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
