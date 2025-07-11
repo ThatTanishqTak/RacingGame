@@ -1,4 +1,5 @@
 #include "trpch.h"
+
 #include "Trinity/Core/Log.h"
 
 #include <spdlog/sinks/stdout_color_sinks.h>

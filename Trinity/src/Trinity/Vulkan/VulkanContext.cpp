@@ -3,8 +3,20 @@
 #include "Trinity/Vulkan/VulkanContext.h"
 #include "Trinity/Core/Log.h"
 
+#include <GLFW/glfw3.h>
+
 namespace Trinity
 {
+    namespace
+    {
+#ifdef NDEBUG
+        constexpr bool enableValidationLayers = false;
+#else
+        constexpr bool enableValidationLayers = true;
+#endif
+        constexpr const char* validationLayers[] = { "VK_LAYER_KHRONOS_validation" };
+    }
+
     VulkanContext::~VulkanContext()
     {
         Shutdown();
@@ -12,21 +24,16 @@ namespace Trinity
 
     bool VulkanContext::Initialize()
     {
-        VkApplicationInfo appInfo{};
-        appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-        appInfo.pApplicationName = "Trinity";
-        appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-        appInfo.pEngineName = "Trinity";
-        appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-        appInfo.apiVersion = VK_API_VERSION_1_0;
-
-        VkInstanceCreateInfo createInfo{};
-        createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-        createInfo.pApplicationInfo = &appInfo;
-
-        if (vkCreateInstance(&createInfo, nullptr, &m_Instance) != VK_SUCCESS)
+        if (!CreateInstance())
         {
-            TR_CORE_ERROR("Failed to create Vulkan instance");
+            TR_CORE_INFO("Failed to create vulkan instance");
+
+            return false;
+        }
+
+        if (enableValidationLayers && !SetupDebugMessenger())
+        {
+            TR_CORE_INFO("Failed to setup debug messenger");
 
             return false;
         }
@@ -57,11 +64,100 @@ namespace Trinity
             vkDestroyDevice(m_Device, nullptr);
             m_Device = VK_NULL_HANDLE;
         }
+
+        if (enableValidationLayers && m_DebugMessenger != VK_NULL_HANDLE)
+        {
+            auto destroyFn = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(m_Instance, "vkDestroyDebugUtilsMessengerEXT"));
+            if (destroyFn)
+            {
+                destroyFn(m_Instance, m_DebugMessenger, nullptr);
+            }
+            
+            m_DebugMessenger = VK_NULL_HANDLE;
+        }
+
         if (m_Instance != VK_NULL_HANDLE)
         {
             vkDestroyInstance(m_Instance, nullptr);
             m_Instance = VK_NULL_HANDLE;
         }
+    }
+
+    bool VulkanContext::CreateInstance()
+    {
+        if (enableValidationLayers && !CheckValidationLayerSupport())
+        {
+            TR_CORE_ERROR("Validation layers requested but not available");
+
+            return false;
+        }
+
+        VkApplicationInfo appInfo{};
+        appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+        appInfo.pApplicationName = "Trinity";
+        appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
+        appInfo.pEngineName = "Trinity";
+        appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
+        appInfo.apiVersion = VK_API_VERSION_1_0;
+
+        uint32_t glfwExtensionCount = 0;
+        const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+
+        std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
+        if (enableValidationLayers)
+            extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+
+        VkInstanceCreateInfo createInfo{};
+        createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+        createInfo.pApplicationInfo = &appInfo;
+        createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
+        createInfo.ppEnabledExtensionNames = extensions.data();
+
+        VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
+        if (enableValidationLayers)
+        {
+            createInfo.enabledLayerCount = 1;
+            createInfo.ppEnabledLayerNames = validationLayers;
+
+            debugCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+            debugCreateInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+            debugCreateInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+            debugCreateInfo.pfnUserCallback = DebugCallback;
+            createInfo.pNext = &debugCreateInfo;
+        }
+        else
+        {
+            createInfo.enabledLayerCount = 0;
+            createInfo.pNext = nullptr;
+        }
+
+        if (vkCreateInstance(&createInfo, nullptr, &m_Instance) != VK_SUCCESS)
+        {
+            TR_CORE_ERROR("Failed to create Vulkan instance");
+
+            return false;
+        }
+
+        return true;
+    }
+
+    bool VulkanContext::SetupDebugMessenger()
+    {
+        VkDebugUtilsMessengerCreateInfoEXT createInfo{};
+        createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+        createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+        createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+        createInfo.pfnUserCallback = DebugCallback;
+
+        auto func = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(m_Instance, "vkCreateDebugUtilsMessengerEXT"));
+        if (func && func(m_Instance, &createInfo, nullptr, &m_DebugMessenger) == VK_SUCCESS)
+        {
+            return true;
+        }
+
+        TR_CORE_ERROR("Failed to set up debug messenger");
+        
+        return false;
     }
 
     bool VulkanContext::PickPhysicalDevice()
@@ -71,6 +167,7 @@ namespace Trinity
         if (deviceCount == 0)
         {
             TR_CORE_ERROR("Failed to find GPUs with Vulkan support");
+
             return false;
         }
 
@@ -89,12 +186,14 @@ namespace Trinity
                 if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
                 {
                     m_PhysicalDevice = device;
+
                     return true;
                 }
             }
         }
 
         TR_CORE_ERROR("Failed to find a suitable GPU");
+
         return false;
     }
 
@@ -112,6 +211,7 @@ namespace Trinity
             if (queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
             {
                 graphicsFamilyIndex = i;
+
                 break;
             }
         }
@@ -119,6 +219,7 @@ namespace Trinity
         if (graphicsFamilyIndex == UINT32_MAX)
         {
             TR_CORE_ERROR("Failed to find graphics queue family");
+
             return false;
         }
 
@@ -134,14 +235,82 @@ namespace Trinity
         deviceCreateInfo.queueCreateInfoCount = 1;
         deviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
 
+        if (enableValidationLayers)
+        {
+            deviceCreateInfo.enabledLayerCount = 1;
+            deviceCreateInfo.ppEnabledLayerNames = validationLayers;
+        }
+
         if (vkCreateDevice(m_PhysicalDevice, &deviceCreateInfo, nullptr, &m_Device) != VK_SUCCESS)
         {
             TR_CORE_ERROR("Failed to create logical device");
+
             return false;
         }
 
         vkGetDeviceQueue(m_Device, graphicsFamilyIndex, 0, &m_GraphicsQueue);
 
         return true;
+    }
+
+    bool VulkanContext::CheckValidationLayerSupport()
+    {
+        uint32_t layerCount;
+        vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+
+        std::vector<VkLayerProperties> availableLayers(layerCount);
+        vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
+
+        for (const char* layerName : validationLayers)
+        {
+            bool layerFound = false;
+
+            for (const auto& layerProperties : availableLayers)
+            {
+                if (strcmp(layerName, layerProperties.layerName) == 0)
+                {
+                    layerFound = true;
+
+                    break;
+                }
+            }
+
+            if (!layerFound)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    VKAPI_ATTR VkBool32 VKAPI_CALL VulkanContext::DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType,
+        const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)
+    {
+        switch (messageSeverity)
+        {
+            case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
+            {
+                TR_CORE_ERROR(pCallbackData->pMessage);
+            
+                break;
+            }
+            
+            case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
+            {
+                TR_CORE_WARN(pCallbackData->pMessage);
+            
+                break;
+            }
+            
+            default:
+            {
+                TR_CORE_INFO(pCallbackData->pMessage);
+            
+                break;
+            }
+        }
+
+        return VK_FALSE;
     }
 }

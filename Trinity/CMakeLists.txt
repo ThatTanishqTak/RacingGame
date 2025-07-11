@@ -20,6 +20,12 @@ target_link_libraries(glfw INTERFACE
     "${CMAKE_CURRENT_SOURCE_DIR}/vendor/glfw/lib-vc2022/glfw3.lib"
 )
 
+# glm
+add_library(glm INTERFACE)
+target_include_directories(glm INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/vendor/glm>    
+)
+
 # Vulkan
 add_library(Vulkan INTERFACE)
 if(DEFINED ENV{VULKAN_SDK})
@@ -33,6 +39,7 @@ else()
     message(FATAL_ERROR "VULKAN_SDK environment variable not set")
 endif()
 
+# Engine source files
 file(GLOB_RECURSE ENGINE_SOURCE
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h"
