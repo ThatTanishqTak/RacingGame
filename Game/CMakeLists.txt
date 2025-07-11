@@ -16,4 +16,5 @@ target_link_options(${PROJECT_NAME} PRIVATE
 target_include_directories(${PROJECT_NAME}
     PRIVATE ${CMAKE_SOURCE_DIR}/Trinity/src
 )
-target_link_libraries(${PROJECT_NAME} PRIVATE Trinity)
+target_link_libraries(${PROJECT_NAME} PRIVATE 
+    Trinity)

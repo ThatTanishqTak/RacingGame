@@ -2,6 +2,8 @@
 
 project(Trinity LANGUAGES CXX)
 
+add_definitions(-DGLFW_INCLUDE_VULKAN)
+
 # Third-Party libraries
 # spdlog
 add_library(spdlog INTERFACE)
@@ -11,6 +13,9 @@ target_include_directories(spdlog INTERFACE
 
 # GLFW
 add_library(glfw INTERFACE)
+target_include_directories(glfw INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/vendor/glfw/include>
+)
 target_link_libraries(glfw INTERFACE 
     "${CMAKE_CURRENT_SOURCE_DIR}/vendor/glfw/lib-vc2022/glfw3.lib"
 )

@@ -1,0 +1,1 @@
+#include "../../Trinity/src/Trinity/Core/Application.h"
