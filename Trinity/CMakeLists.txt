@@ -17,8 +17,16 @@ target_link_libraries(glfw INTERFACE
 
 # Vulkan
 add_library(Vulkan INTERFACE)
-target_link_libraries(Vulkan INTERFACE 
-    "vulkan-1.lib")
+if(DEFINED ENV{VULKAN_SDK})
+    set(Vulkan_SDK $ENV{VULKAN_SDK})
+    message(STATUS "Using Vulkan SDK from ${Vulkan_SDK}")
+    target_include_directories(Vulkan INTERFACE
+        "${Vulkan_SDK}/Include")
+    target_link_libraries(Vulkan INTERFACE
+        "${Vulkan_SDK}/Lib/vulkan-1.lib")
+else()
+    message(FATAL_ERROR "VULKAN_SDK environment variable not set")
+endif()
 
 file(GLOB_RECURSE ENGINE_SOURCE
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
