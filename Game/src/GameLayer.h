@@ -1,1 +1,1 @@
-#include "../../Trinity/src/Trinity/Core/Application.h"
+#include "Trinity/Core/Application.h"

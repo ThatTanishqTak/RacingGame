@@ -2,6 +2,7 @@
 
 #include "Trinity/Core/Core.h"
 #include "Trinity/Vulkan/VulkanContext.h"
+#include "Trinity/Core/Window.h"
 
 namespace Trinity
 {
@@ -13,7 +14,7 @@ namespace Trinity
 
     struct ApplicationSpecification
     {
-        std::string Name = "Trinity";
+        std::string Name = "Game";
         ApplicationCommandLineArgs CommandLineArgs;
     };
 
@@ -26,11 +27,16 @@ namespace Trinity
 
         virtual void Run()
         {
-
+            while (m_Window && !m_Window->ShouldClose())
+            {
+                m_Window->PollEvents();
+            }
         }
 
     protected:
         ApplicationSpecification m_Specification;
+        
+        std::unique_ptr<Window> m_Window;
         std::unique_ptr<VulkanContext> m_VulkanContext;
     };
 }
