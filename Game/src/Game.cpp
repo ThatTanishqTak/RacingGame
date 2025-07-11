@@ -10,7 +10,7 @@ namespace Trinity
 	public:
 		Game(const ApplicationSpecification& specs) : Application(specs)
 		{
-			PushLayer(GameLayer);
+
 		}
 	};
 

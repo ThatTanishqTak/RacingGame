@@ -3,7 +3,10 @@
 #include "Trinity/Core/Core.h"
 #include "Trinity/Core/Application.h"
 
-extern Trinity::Application* Trinity::CreateApplication(Trinity::ApplicationCommandLineArgs args);
+namespace Trinity
+{
+	Application* CreateApplication(ApplicationCommandLineArgs args);
+}
 
 int main(int args, char** argv)
 {
