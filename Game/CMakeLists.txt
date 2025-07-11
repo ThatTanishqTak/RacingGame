@@ -1,3 +1,5 @@
+##--- Game ---##
+
 project(Game LANGUAGES CXX)
 
 file(GLOB_RECURSE GAME_SOURCES

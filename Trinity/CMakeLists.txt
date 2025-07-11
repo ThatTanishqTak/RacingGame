@@ -1,22 +1,29 @@
+##--- Engine ---##
+
 project(Trinity LANGUAGES CXX)
 
-# Third-Party libraries
-# spdlog
-add_library(spdlog INTERFACE)
-target_include_directories(spdlog INTERFACE
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/vendor/spdlog/include>
-)
+# Engine dependencies
+find_package(Vulkan REQUIRED)
+find_package(glfw3 3.3 REQUIRED)
 
+find_package(spdlog REQUIRED)
+
+# Include dir
 file(GLOB_RECURSE ENGINE_SOURCE
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/*.h"
 )
 
-add_library(${PROJECT_NAME} STATIC ${ENGINE_SOURCE})
+# Output .lib
+add_library(${PROJECT_NAME} STATIC 
+	${ENGINE_SOURCE}
+)
 
 # Link libraries
 target_link_libraries(${PROJECT_NAME} PUBLIC
-	spdlog
+        spdlog::spdlog
+        glfw
+        Vulkan::Vulkan
 )
 
 target_precompile_headers(${PROJECT_NAME} PRIVATE 
