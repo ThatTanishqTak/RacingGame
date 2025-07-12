@@ -25,10 +25,24 @@ namespace Trinity
             return false;
         }
 
+        if (m_Framebuffer)
+        {
+            m_Framebuffer->Shutdown();
+            m_Framebuffer.reset();
+        }
+
         m_Pipeline = std::make_unique<VulkanPipeline>();
         if (!m_Pipeline->Initialize(context, m_RenderPass->GetRenderPass(), "assets/shaders/simple.vert.spv", "assets/shaders/simple.frag.spv"))
         {
             TR_CORE_ERROR("Failed to create graphics pipeline");
+
+            return false;
+        }
+
+        m_Framebuffer = std::make_unique<VulkanFramebuffer>();
+        if (!m_Framebuffer->Initialize(context, m_RenderPass->GetRenderPass(), m_SwapChain->GetImageViews(), m_SwapChain->GetExtent()))
+        {
+            TR_CORE_ERROR("Failed to create framebuffers");
             
             return false;
         }
