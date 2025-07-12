@@ -5,9 +5,10 @@
 
 namespace Trinity
 {
-    bool VulkanPipeline::Initialize(VulkanContext* context, const std::string& vertPath, const std::string& fragPath)
+    bool VulkanPipeline::Initialize(VulkanContext* context, VkRenderPass renderPass, const std::string& vertPath, const std::string& fragPath)
     {
         m_Context = context;
+        m_RenderPass = renderPass;
 
         if (!CreatePipelineLayout())
         {
@@ -39,6 +40,8 @@ namespace Trinity
             vkDestroyPipelineLayout(device, m_PipelineLayout, nullptr);
             m_PipelineLayout = VK_NULL_HANDLE;
         }
+
+        m_RenderPass = VK_NULL_HANDLE;
 
         TR_CORE_INFO("Graphics pipeline destroyed");
     }
@@ -177,7 +180,7 @@ namespace Trinity
         pipelineInfo.pMultisampleState = &multisampling;
         pipelineInfo.pColorBlendState = &colorBlending;
         pipelineInfo.layout = m_PipelineLayout;
-        pipelineInfo.renderPass = VK_NULL_HANDLE; // Placeholder
+        pipelineInfo.renderPass = m_RenderPass;
         pipelineInfo.subpass = 0;
 
         if (vkCreateGraphicsPipelines(m_Context->GetDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_Pipeline) != VK_SUCCESS)

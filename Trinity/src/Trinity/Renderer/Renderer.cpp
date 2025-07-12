@@ -13,13 +13,23 @@ namespace Trinity
         if (!m_SwapChain->Initialize(context))
         {
             TR_CORE_ERROR("Failed to initialize swap chain");
+            
+            return false;
+        }
+
+        m_RenderPass = std::make_unique<VulkanRenderPass>();
+        if (!m_RenderPass->Initialize(context, m_SwapChain->GetImageFormat()))
+        {
+            TR_CORE_ERROR("Failed to create render pass");
+
             return false;
         }
 
         m_Pipeline = std::make_unique<VulkanPipeline>();
-        if (!m_Pipeline->Initialize(context, "assets/shaders/simple.vert.spv", "assets/shaders/simple.frag.spv"))
+        if (!m_Pipeline->Initialize(context, m_RenderPass->GetRenderPass(), "assets/shaders/simple.vert.spv", "assets/shaders/simple.frag.spv"))
         {
             TR_CORE_ERROR("Failed to create graphics pipeline");
+            
             return false;
         }
 
@@ -34,6 +44,12 @@ namespace Trinity
         {
             m_Pipeline->Shutdown();
             m_Pipeline.reset();
+        }
+
+        if (m_RenderPass)
+        {
+            m_RenderPass->Shutdown();
+            m_RenderPass.reset();
         }
 
         if (m_SwapChain)

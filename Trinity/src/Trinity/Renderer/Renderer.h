@@ -4,6 +4,7 @@
 
 #include "Trinity/Vulkan/VulkanContext.h"
 #include "Trinity/Vulkan/VulkanSwapchain.h"
+#include "Trinity/Vulkan/VulkanRenderPass.h"
 #include "Trinity/Vulkan/VulkanPipeline.h"
 
 namespace Trinity
@@ -23,6 +24,7 @@ namespace Trinity
     private:
         VulkanContext* m_Context = nullptr;
         std::unique_ptr<VulkanSwapChain> m_SwapChain;
+        std::unique_ptr<VulkanRenderPass> m_RenderPass;
         std::unique_ptr<VulkanPipeline> m_Pipeline;
     };
 }
