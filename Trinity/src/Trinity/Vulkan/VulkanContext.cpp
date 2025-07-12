@@ -65,6 +65,7 @@ namespace Trinity
         {
             vkDestroyDevice(m_Device, nullptr);
             m_Device = VK_NULL_HANDLE;
+            m_GraphicsFamilyIndex = UINT32_MAX;
         }
 
         if (m_Surface != VK_NULL_HANDLE)
@@ -304,6 +305,8 @@ namespace Trinity
 
             return false;
         }
+
+        m_GraphicsFamilyIndex = graphicsFamilyIndex;
 
         float queuePriority = 1.0f;
         VkDeviceQueueCreateInfo queueCreateInfo{};

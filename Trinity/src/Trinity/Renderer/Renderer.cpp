@@ -43,7 +43,15 @@ namespace Trinity
         if (!m_Framebuffer->Initialize(context, m_RenderPass->GetRenderPass(), m_SwapChain->GetImageViews(), m_SwapChain->GetExtent()))
         {
             TR_CORE_ERROR("Failed to create framebuffers");
-            
+
+            return false;
+        }
+
+        m_CommandBuffers = std::make_unique<VulkanCommandBuffer>();
+        if (!m_CommandBuffers->Initialize(context, static_cast<uint32_t>(m_Framebuffer->GetFramebuffers().size())))
+        {
+            TR_CORE_ERROR("Failed to create command buffers");
+
             return false;
         }
 
@@ -72,16 +80,56 @@ namespace Trinity
             m_SwapChain.reset();
         }
 
+        if (m_CommandBuffers)
+        {
+            m_CommandBuffers->Shutdown();
+            m_CommandBuffers.reset();
+        }
+
         TR_CORE_INFO("Renderer shutdown successfully");
     }
 
     void Renderer::BeginFrame()
     {
+        const auto& buffers = m_CommandBuffers->GetCommandBuffers();
+        VkCommandBuffer commandBuffer = buffers[m_CurrentFrame];
 
+        VkCommandBufferBeginInfo beginInfo{};
+        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+        vkBeginCommandBuffer(commandBuffer, &beginInfo);
+
+        VkRenderPassBeginInfo renderPassInfo{};
+        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        renderPassInfo.renderPass = m_RenderPass->GetRenderPass();
+        renderPassInfo.framebuffer = m_Framebuffer->GetFramebuffers()[m_CurrentFrame];
+        renderPassInfo.renderArea.offset = { 0, 0 };
+        renderPassInfo.renderArea.extent = m_SwapChain->GetExtent();
+        VkClearValue clearColor{};
+        clearColor.color = { {0.0f, 0.0f, 0.0f, 1.0f} };
+        renderPassInfo.clearValueCount = 1;
+        renderPassInfo.pClearValues = &clearColor;
+
+        vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+        vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_Pipeline->GetPipeline());
+        vkCmdDraw(commandBuffer, 3, 1, 0, 0);
     }
 
     void Renderer::EndFrame()
     {
+        const auto& buffers = m_CommandBuffers->GetCommandBuffers();
+        VkCommandBuffer commandBuffer = buffers[m_CurrentFrame];
 
+        vkCmdEndRenderPass(commandBuffer);
+        vkEndCommandBuffer(commandBuffer);
+
+        VkSubmitInfo submitInfo{};
+        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        submitInfo.commandBufferCount = 1;
+        submitInfo.pCommandBuffers = &commandBuffer;
+        vkQueueSubmit(m_Context->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
+        vkQueueWaitIdle(m_Context->GetGraphicsQueue());
+
+        m_CurrentFrame = (m_CurrentFrame + 1) % static_cast<uint32_t>(buffers.size());
     }
 }

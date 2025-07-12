@@ -7,6 +7,7 @@
 #include "Trinity/Vulkan/VulkanRenderPass.h"
 #include "Trinity/Vulkan/VulkanPipeline.h"
 #include "Trinity/Vulkan/VulkanFramebuffer.h"
+#include "Trinity/Vulkan/VulkanCommandBuffer.h"
 
 namespace Trinity
 {
@@ -29,5 +30,8 @@ namespace Trinity
         std::unique_ptr<VulkanRenderPass> m_RenderPass;
         std::unique_ptr<VulkanPipeline> m_Pipeline;
         std::unique_ptr<VulkanFramebuffer> m_Framebuffer;
+        std::unique_ptr<VulkanCommandBuffer> m_CommandBuffers;
+
+        uint32_t m_CurrentFrame = 0;
     };
 }

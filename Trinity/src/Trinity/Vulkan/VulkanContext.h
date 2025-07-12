@@ -18,6 +18,7 @@ namespace Trinity
         VkPhysicalDevice GetPhysicalDevice() const { return m_PhysicalDevice; }
         VkSurfaceKHR GetSurface() const { return m_Surface; }
         VkQueue GetGraphicsQueue() const { return m_GraphicsQueue; }
+        uint32_t GetGraphicsFamilyIndex() const { return m_GraphicsFamilyIndex; }
 
     private:
         bool CreateSurface(GLFWwindow* window);
@@ -38,5 +39,6 @@ namespace Trinity
         VkDevice m_Device = VK_NULL_HANDLE;
         VkSurfaceKHR m_Surface = VK_NULL_HANDLE;
         VkQueue m_GraphicsQueue = VK_NULL_HANDLE;
+        uint32_t m_GraphicsFamilyIndex = UINT32_MAX;
     };
 }
