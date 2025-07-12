@@ -3,7 +3,7 @@
 #include "Trinity/Core/Core.h"
 
 #include "Trinity/Vulkan/VulkanContext.h"
-#include "Trinity/Vulkan/VulkanSwapChain.h"
+#include "Trinity/Vulkan/VulkanSwapchain.h"
 
 namespace Trinity
 {

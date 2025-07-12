@@ -1,6 +1,6 @@
 #include "trpch.h"
 
-#include "Trinity/Vulkan/VulkanSwapChain.h"
+#include "Trinity/Vulkan/VulkanSwapchain.h"
 #include "Trinity/Core/Log.h"
 
 namespace Trinity
@@ -144,7 +144,7 @@ namespace Trinity
             VkImageViewCreateInfo createInfo{};
             createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
             createInfo.image = m_Images[i];
-            createInfo.viewType = VK_IMAGE_VIEW_TYPE_3D;
+            createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
             createInfo.format = m_ImageFormat;
             createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
             createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
