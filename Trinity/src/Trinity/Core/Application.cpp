@@ -19,7 +19,7 @@ namespace Trinity
         }
 
         m_VulkanContext = std::make_unique<VulkanContext>();
-        if (!m_VulkanContext->Initialize())
+        if (!m_VulkanContext->Initialize(m_Window->GetNativeWindow()))
         {
             TR_CORE_ERROR("Failed to initialize Vulkan context");
         }

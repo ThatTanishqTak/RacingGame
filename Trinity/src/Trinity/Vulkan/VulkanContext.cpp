@@ -17,7 +17,7 @@ namespace Trinity
         constexpr const char* validationLayers[] = { "VK_LAYER_KHRONOS_validation" };
     }
 
-    bool VulkanContext::Initialize()
+    bool VulkanContext::Initialize(GLFWwindow* window)
     {
         if (!CreateInstance())
         {
@@ -29,6 +29,13 @@ namespace Trinity
         if (enableValidationLayers && !SetupDebugMessenger())
         {
             TR_CORE_INFO("Failed to setup debug messenger");
+
+            return false;
+        }
+
+        if (!CreateSurface(window))
+        {
+            TR_CORE_INFO("Failed to create window surface");
 
             return false;
         }
@@ -58,6 +65,12 @@ namespace Trinity
         {
             vkDestroyDevice(m_Device, nullptr);
             m_Device = VK_NULL_HANDLE;
+        }
+
+        if (m_Surface != VK_NULL_HANDLE)
+        {
+            vkDestroySurfaceKHR(m_Instance, m_Surface, nullptr);
+            m_Surface = VK_NULL_HANDLE;
         }
 
         if (enableValidationLayers && m_DebugMessenger != VK_NULL_HANDLE)
@@ -136,7 +149,9 @@ namespace Trinity
 
             return false;
         }
-
+        
+        TR_CORE_TRACE("Vulkan instance created");
+        
         return true;
     }
 
@@ -151,12 +166,28 @@ namespace Trinity
         auto func = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(m_Instance, "vkCreateDebugUtilsMessengerEXT"));
         if (func && func(m_Instance, &createInfo, nullptr, &m_DebugMessenger) == VK_SUCCESS)
         {
+            TR_CORE_TRACE("Debug messenger created");
+         
             return true;
         }
 
         TR_CORE_ERROR("Failed to set up debug messenger");
         
         return false;
+    }
+
+    bool VulkanContext::CreateSurface(GLFWwindow* window)
+    {
+        if (glfwCreateWindowSurface(m_Instance, window, nullptr, &m_Surface) != VK_SUCCESS)
+        {
+            TR_CORE_ERROR("Failed to create window surface");
+
+            return false;
+        }
+
+        TR_CORE_TRACE("Window surface created");
+
+        return true;
     }
 
     bool VulkanContext::PickPhysicalDevice()
@@ -180,11 +211,15 @@ namespace Trinity
             std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
             vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
 
-            for (const auto& queueFamily : queueFamilies)
+            for (uint32_t i = 0; i < queueFamilies.size(); ++i)
             {
-                if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+                VkBool32 presentSupport = VK_FALSE;
+                vkGetPhysicalDeviceSurfaceSupportKHR(device, i, m_Surface, &presentSupport);
+
+                if ((queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) && presentSupport)
                 {
                     m_PhysicalDevice = device;
+                    TR_CORE_TRACE("Suitable graphics card found: {}");
 
                     return true;
                 }
@@ -207,7 +242,10 @@ namespace Trinity
         uint32_t graphicsFamilyIndex = UINT32_MAX;
         for (uint32_t i = 0; i < queueFamilies.size(); ++i)
         {
-            if (queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
+            VkBool32 presentSupport = VK_FALSE;
+            vkGetPhysicalDeviceSurfaceSupportKHR(m_PhysicalDevice, i, m_Surface, &presentSupport);
+
+            if ((queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) && presentSupport)
             {
                 graphicsFamilyIndex = i;
 
@@ -248,6 +286,8 @@ namespace Trinity
         }
 
         vkGetDeviceQueue(m_Device, graphicsFamilyIndex, 0, &m_GraphicsQueue);
+        
+        TR_CORE_TRACE("Logical device created");
 
         return true;
     }

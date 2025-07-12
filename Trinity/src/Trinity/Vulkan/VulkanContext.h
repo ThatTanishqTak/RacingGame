@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vulkan/vulkan.h>
+#include <GLFW/glfw3.h>
 
 namespace Trinity
 {
@@ -10,10 +11,11 @@ namespace Trinity
         VulkanContext() = default;
         ~VulkanContext() = default;
 
-        bool Initialize();
+        bool Initialize(GLFWwindow* window);
         void Shutdown();
 
     private:
+        bool CreateSurface(GLFWwindow* window);
         bool CreateInstance();
         bool SetupDebugMessenger();
         bool PickPhysicalDevice();
@@ -27,6 +29,7 @@ namespace Trinity
         VkDebugUtilsMessengerEXT m_DebugMessenger = VK_NULL_HANDLE;
         VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
         VkDevice m_Device = VK_NULL_HANDLE;
+        VkSurfaceKHR m_Surface = VK_NULL_HANDLE;
         VkQueue m_GraphicsQueue = VK_NULL_HANDLE;
     };
 }
