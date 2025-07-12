@@ -7,7 +7,7 @@ namespace Trinity
 {
     struct WindowSpecification
     {
-        std::string Title = "Trinity";
+        std::string Title = "Trinity-Application";
         uint32_t Width = 1920;
         uint32_t Height = 1080;
     };

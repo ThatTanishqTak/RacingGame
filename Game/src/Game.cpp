@@ -17,7 +17,9 @@ namespace Trinity
 	Application* CreateApplication(ApplicationCommandLineArgs args)
 	{
 		ApplicationSpecification specs;
-		specs.Name = "Game";
+		specs.Name = "Racing Game";
+		specs.Width = 1920;
+		specs.Height = 1080;
 		specs.CommandLineArgs = args;
 
 		return new Game(specs);

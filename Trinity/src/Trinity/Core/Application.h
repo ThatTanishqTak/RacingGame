@@ -14,7 +14,9 @@ namespace Trinity
 
     struct ApplicationSpecification
     {
-        std::string Name = "Game";
+        std::string Name = "Trinity-Application";
+        unsigned int Width = 1920;
+        unsigned int Height = 1080;
         ApplicationCommandLineArgs CommandLineArgs;
     };
 
