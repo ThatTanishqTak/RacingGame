@@ -23,6 +23,7 @@ namespace Trinity
 
     private:
         VulkanContext* m_Context = nullptr;
+
         std::unique_ptr<VulkanSwapChain> m_SwapChain;
         std::unique_ptr<VulkanRenderPass> m_RenderPass;
         std::unique_ptr<VulkanPipeline> m_Pipeline;

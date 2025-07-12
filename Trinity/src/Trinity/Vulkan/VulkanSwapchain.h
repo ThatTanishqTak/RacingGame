@@ -23,6 +23,7 @@ namespace Trinity
         bool CreateSwapChain();
         bool CreateImageViews();
 
+    private:
         VulkanContext* m_Context = nullptr;
         VkSwapchainKHR m_SwapChain = VK_NULL_HANDLE;
         VkFormat m_ImageFormat = VK_FORMAT_UNDEFINED;

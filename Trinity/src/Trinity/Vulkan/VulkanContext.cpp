@@ -190,7 +190,7 @@ namespace Trinity
         return true;
     }
 
-    bool VulkanContext::HasGraphicsAndPresent(VkPhysicalDevice device)
+    bool VulkanContext::HasGraphicsAndPresent(VkPhysicalDevice device) const
     {
         uint32_t qCount = 0;
         vkGetPhysicalDeviceQueueFamilyProperties(device, &qCount, nullptr);

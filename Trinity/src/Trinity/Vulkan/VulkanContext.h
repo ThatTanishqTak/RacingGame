@@ -24,13 +24,14 @@ namespace Trinity
         bool CreateInstance();
         bool SetupDebugMessenger();
         bool PickPhysicalDevice();
-        bool HasGraphicsAndPresent(VkPhysicalDevice device);
+        bool HasGraphicsAndPresent(VkPhysicalDevice device) const;
         bool CreateLogicalDevice();
         bool CheckValidationLayerSupport();
 
         static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType,
             const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData);
 
+    private:
         VkInstance m_Instance = VK_NULL_HANDLE;
         VkDebugUtilsMessengerEXT m_DebugMessenger = VK_NULL_HANDLE;
         VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
