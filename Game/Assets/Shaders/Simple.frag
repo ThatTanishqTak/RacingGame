@@ -1,7 +1,7 @@
 #version 330 core
 
 // Fragment shader output: the final color of the fragment
-out vec4 FragColor;
+layout(location = 0) out vec4 FragColor;
 
 void main()
 {
