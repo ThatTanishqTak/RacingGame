@@ -107,6 +107,14 @@ namespace Trinity
 
     void Renderer::BeginFrame()
     {
+        uint32_t imageIndex = 0;
+        if (!m_SwapChain->AcquireNextImage(&imageIndex))
+        {
+            return;
+        }
+
+        m_CurrentFrame = imageIndex;
+
         const auto& buffers = m_CommandBuffers->GetCommandBuffers();
         VkCommandBuffer commandBuffer = buffers[m_CurrentFrame];
 
@@ -146,11 +154,22 @@ namespace Trinity
 
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+        VkSemaphore waitSemaphores[] = { m_SwapChain->GetImageAvailableSemaphore() };
+        VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+        submitInfo.waitSemaphoreCount = 1;
+        submitInfo.pWaitSemaphores = waitSemaphores;
+        submitInfo.pWaitDstStageMask = waitStages;
+
         submitInfo.commandBufferCount = 1;
         submitInfo.pCommandBuffers = &commandBuffer;
-        vkQueueSubmit(m_Context->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
-        vkQueueWaitIdle(m_Context->GetGraphicsQueue());
 
-        m_CurrentFrame = (m_CurrentFrame + 1) % static_cast<uint32_t>(buffers.size());
+        VkSemaphore signalSemaphores[] = { m_SwapChain->GetRenderFinishedSemaphore() };
+        submitInfo.signalSemaphoreCount = 1;
+        submitInfo.pSignalSemaphores = signalSemaphores;
+
+        vkQueueSubmit(m_Context->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
+
+        m_SwapChain->PresentImage(m_CurrentFrame);
     }
 }

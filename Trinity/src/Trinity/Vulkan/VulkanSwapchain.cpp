@@ -19,6 +19,16 @@ namespace Trinity
             return false;
         }
 
+        VkSemaphoreCreateInfo semaphoreInfo{};
+        semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+        if (vkCreateSemaphore(m_Context->GetDevice(), &semaphoreInfo, nullptr, &m_ImageAvailableSemaphore) != VK_SUCCESS ||
+            vkCreateSemaphore(m_Context->GetDevice(), &semaphoreInfo, nullptr, &m_RenderFinishedSemaphore) != VK_SUCCESS)
+        {
+            TR_CORE_ERROR("Failed to create presentation semaphores");
+
+            return false;
+        }
+
         TR_CORE_INFO("Swap chain initialized successfully");
 
         return true;
@@ -38,6 +48,18 @@ namespace Trinity
         {
             vkDestroySwapchainKHR(device, m_SwapChain, nullptr);
             m_SwapChain = VK_NULL_HANDLE;
+        }
+
+        if (m_ImageAvailableSemaphore != VK_NULL_HANDLE)
+        {
+            vkDestroySemaphore(device, m_ImageAvailableSemaphore, nullptr);
+            m_ImageAvailableSemaphore = VK_NULL_HANDLE;
+        }
+
+        if (m_RenderFinishedSemaphore != VK_NULL_HANDLE)
+        {
+            vkDestroySemaphore(device, m_RenderFinishedSemaphore, nullptr);
+            m_RenderFinishedSemaphore = VK_NULL_HANDLE;
         }
 
         TR_CORE_INFO("Swap chain shutdown successfully");
@@ -165,6 +187,39 @@ namespace Trinity
         }
 
         TR_CORE_TRACE("Swap chain image views created ({})", m_ImageViews.size());
+
+        return true;
+    }
+
+    bool VulkanSwapChain::AcquireNextImage(uint32_t* imageIndex)
+    {
+        VkResult result = vkAcquireNextImageKHR(m_Context->GetDevice(), m_SwapChain, UINT64_MAX,
+            m_ImageAvailableSemaphore, VK_NULL_HANDLE, imageIndex);
+        if (result != VK_SUCCESS)
+        {
+            TR_CORE_ERROR("Failed to acquire swap chain image");
+            return false;
+        }
+
+        return true;
+    }
+
+    bool VulkanSwapChain::PresentImage(uint32_t imageIndex)
+    {
+        VkPresentInfoKHR presentInfo{};
+        presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+        presentInfo.waitSemaphoreCount = 1;
+        presentInfo.pWaitSemaphores = &m_RenderFinishedSemaphore;
+        presentInfo.swapchainCount = 1;
+        presentInfo.pSwapchains = &m_SwapChain;
+        presentInfo.pImageIndices = &imageIndex;
+
+        VkResult result = vkQueuePresentKHR(m_Context->GetGraphicsQueue(), &presentInfo);
+        if (result != VK_SUCCESS)
+        {
+            TR_CORE_ERROR("Failed to present swap chain image");
+            return false;
+        }
 
         return true;
     }

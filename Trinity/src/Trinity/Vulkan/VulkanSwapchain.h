@@ -14,6 +14,12 @@ namespace Trinity
         bool Initialize(VulkanContext* context);
         void Shutdown();
 
+        bool AcquireNextImage(uint32_t* imageIndex);
+        bool PresentImage(uint32_t imageIndex);
+
+        VkSemaphore GetImageAvailableSemaphore() const { return m_ImageAvailableSemaphore; }
+        VkSemaphore GetRenderFinishedSemaphore() const { return m_RenderFinishedSemaphore; }
+
         VkSwapchainKHR GetSwapChain() const { return m_SwapChain; }
         VkFormat GetImageFormat() const { return m_ImageFormat; }
         VkExtent2D GetExtent() const { return m_Extent; }
@@ -30,5 +36,8 @@ namespace Trinity
         VkExtent2D m_Extent{};
         std::vector<VkImage> m_Images;
         std::vector<VkImageView> m_ImageViews;
+
+        VkSemaphore m_ImageAvailableSemaphore = VK_NULL_HANDLE;
+        VkSemaphore m_RenderFinishedSemaphore = VK_NULL_HANDLE;
     };
 }
