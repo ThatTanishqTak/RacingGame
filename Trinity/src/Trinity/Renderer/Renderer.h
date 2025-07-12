@@ -1,7 +1,9 @@
 #pragma once
 
 #include "Trinity/Core/Core.h"
+
 #include "Trinity/Vulkan/VulkanContext.h"
+#include "Trinity/Vulkan/VulkanSwapChain.h"
 
 namespace Trinity
 {
@@ -19,5 +21,6 @@ namespace Trinity
 
     private:
         VulkanContext* m_Context = nullptr;
+        std::unique_ptr<VulkanSwapChain> m_SwapChain;
     };
 }

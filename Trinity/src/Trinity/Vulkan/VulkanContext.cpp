@@ -271,6 +271,9 @@ namespace Trinity
         deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
         deviceCreateInfo.queueCreateInfoCount = 1;
         deviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
+        const char* deviceExtensions[] = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+        deviceCreateInfo.enabledExtensionCount = 1;
+        deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions;
 
         if (enableValidationLayers)
         {

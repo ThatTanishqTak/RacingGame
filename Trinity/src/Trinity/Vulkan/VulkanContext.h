@@ -14,6 +14,11 @@ namespace Trinity
         bool Initialize(GLFWwindow* window);
         void Shutdown();
 
+        VkDevice GetDevice() const { return m_Device; }
+        VkPhysicalDevice GetPhysicalDevice() const { return m_PhysicalDevice; }
+        VkSurfaceKHR GetSurface() const { return m_Surface; }
+        VkQueue GetGraphicsQueue() const { return m_GraphicsQueue; }
+
     private:
         bool CreateSurface(GLFWwindow* window);
         bool CreateInstance();
