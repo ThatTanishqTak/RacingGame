@@ -55,6 +55,16 @@ namespace Trinity
             return false;
         }
 
+        const std::array<Vertex, 3> vertices{ { { { 0.0f, -0.5f, 0.0f } }, { { 0.5f,  0.5f, 0.0f } }, { { -0.5f, 0.5f, 0.0f } } } };
+
+        m_VertexBuffer = std::make_unique<VulkanBuffer>();
+        if (!m_VertexBuffer->Initialize(context, sizeof(vertices), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, vertices.data()))
+        {
+            TR_CORE_ERROR("Failed to create vertex buffer");
+            return false;
+        }
+
         TR_CORE_INFO("Renderer initialized successfully");
 
         return true;
@@ -86,6 +96,12 @@ namespace Trinity
             m_CommandBuffers.reset();
         }
 
+        if (m_VertexBuffer)
+        {
+            m_VertexBuffer->Shutdown();
+            m_VertexBuffer.reset();
+        }
+
         TR_CORE_INFO("Renderer shutdown successfully");
     }
 
@@ -112,6 +128,11 @@ namespace Trinity
 
         vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
         vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_Pipeline->GetPipeline());
+
+        VkBuffer vertexBuffers[] = { m_VertexBuffer->GetBuffer() };
+        VkDeviceSize offsets[] = { 0 };
+        vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+
         vkCmdDraw(commandBuffer, 3, 1, 0, 0);
     }
 

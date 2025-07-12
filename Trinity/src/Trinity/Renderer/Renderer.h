@@ -8,6 +8,7 @@
 #include "Trinity/Vulkan/VulkanPipeline.h"
 #include "Trinity/Vulkan/VulkanFramebuffer.h"
 #include "Trinity/Vulkan/VulkanCommandBuffer.h"
+#include "Trinity/Vulkan/VulkanBuffer.h"
 
 namespace Trinity
 {
@@ -31,6 +32,7 @@ namespace Trinity
         std::unique_ptr<VulkanPipeline> m_Pipeline;
         std::unique_ptr<VulkanFramebuffer> m_Framebuffer;
         std::unique_ptr<VulkanCommandBuffer> m_CommandBuffers;
+        std::unique_ptr<VulkanBuffer> m_VertexBuffer;
 
         uint32_t m_CurrentFrame = 0;
     };
