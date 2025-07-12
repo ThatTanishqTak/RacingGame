@@ -8,7 +8,7 @@ namespace Trinity
     {
     public:
         VulkanContext() = default;
-        ~VulkanContext();
+        ~VulkanContext() = default;
 
         bool Initialize();
         void Shutdown();

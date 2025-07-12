@@ -51,6 +51,7 @@ add_library(${PROJECT_NAME} STATIC ${ENGINE_SOURCE})
 target_link_libraries(${PROJECT_NAME} PUBLIC
     spdlog
     glfw
+    glm
     Vulkan
 )
 

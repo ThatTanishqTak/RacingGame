@@ -4,6 +4,8 @@
 #include "Trinity/Vulkan/VulkanContext.h"
 #include "Trinity/Core/Window.h"
 
+#include "Trinity/Renderer/Renderer.h"
+
 namespace Trinity
 {
     struct ApplicationCommandLineArgs
@@ -32,6 +34,12 @@ namespace Trinity
             while (m_Window && !m_Window->ShouldClose())
             {
                 m_Window->PollEvents();
+
+                if (m_Renderer)
+                {
+                    m_Renderer->BeginFrame();
+                    m_Renderer->EndFrame();
+                }
             }
         }
 
@@ -40,5 +48,6 @@ namespace Trinity
         
         std::unique_ptr<Window> m_Window;
         std::unique_ptr<VulkanContext> m_VulkanContext;
+        std::unique_ptr<Renderer> m_Renderer;
     };
 }

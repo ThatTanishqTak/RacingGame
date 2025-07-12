@@ -1,9 +1,12 @@
+#include "trpch.h"
+
 #include "Application.h"
 
 #include "Trinity/Vulkan/VulkanContext.h"
 
 #include "Trinity/Core/Log.h"
 #include "Trinity/Core/Window.h"
+#include "Trinity/Renderer/Renderer.h"
 
 namespace Trinity
 {
@@ -20,10 +23,22 @@ namespace Trinity
         {
             TR_CORE_ERROR("Failed to initialize Vulkan context");
         }
+
+        m_Renderer = std::make_unique<Renderer>();
+        if (!m_Renderer->Initialize(m_VulkanContext.get()))
+        {
+            TR_CORE_ERROR("Failed to initialize renderer");
+        }
     }
 
     Application::~Application()
     {
+        if (m_Renderer)
+        {
+            m_Renderer->Shutdown();
+        }
+
+
         if (m_VulkanContext)
         {
             m_VulkanContext->Shutdown();

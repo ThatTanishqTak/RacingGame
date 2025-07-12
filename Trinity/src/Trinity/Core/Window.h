@@ -17,7 +17,7 @@ namespace Trinity
     public:
         Window() = default;
         Window(const WindowSpecification& specification);
-        ~Window();
+        ~Window() = default;
 
         bool Initialize();
         void Shutdown();

@@ -17,11 +17,6 @@ namespace Trinity
         constexpr const char* validationLayers[] = { "VK_LAYER_KHRONOS_validation" };
     }
 
-    VulkanContext::~VulkanContext()
-    {
-        Shutdown();
-    }
-
     bool VulkanContext::Initialize()
     {
         if (!CreateInstance())
@@ -81,6 +76,8 @@ namespace Trinity
             vkDestroyInstance(m_Instance, nullptr);
             m_Instance = VK_NULL_HANDLE;
         }
+
+        TR_CORE_INFO("Vulkan shutdown successfully");
     }
 
     bool VulkanContext::CreateInstance()

@@ -7,11 +7,7 @@ namespace Trinity
 {
     Window::Window(const WindowSpecification& specification) : m_Specification(specification)
     {
-    }
 
-    Window::~Window()
-    {
-        Shutdown();
     }
 
     bool Window::Initialize()
@@ -35,6 +31,8 @@ namespace Trinity
             return false;
         }
 
+        TR_CORE_INFO("Window initialized successfully");
+
         return true;
     }
 
@@ -47,6 +45,8 @@ namespace Trinity
 
             glfwTerminate();
         }
+
+        TR_CORE_INFO("Window shutdown successfully");
     }
 
     void Window::PollEvents()
