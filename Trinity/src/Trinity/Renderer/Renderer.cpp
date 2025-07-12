@@ -16,6 +16,13 @@ namespace Trinity
             return false;
         }
 
+        m_Pipeline = std::make_unique<VulkanPipeline>();
+        if (!m_Pipeline->Initialize(context, "assets/shaders/simple.vert.spv", "assets/shaders/simple.frag.spv"))
+        {
+            TR_CORE_ERROR("Failed to create graphics pipeline");
+            return false;
+        }
+
         TR_CORE_INFO("Renderer initialized successfully");
 
         return true;
@@ -23,6 +30,12 @@ namespace Trinity
 
     void Renderer::Shutdown()
     {
+        if (m_Pipeline)
+        {
+            m_Pipeline->Shutdown();
+            m_Pipeline.reset();
+        }
+
         if (m_SwapChain)
         {
             m_SwapChain->Shutdown();

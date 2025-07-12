@@ -24,6 +24,7 @@ namespace Trinity
         bool CreateInstance();
         bool SetupDebugMessenger();
         bool PickPhysicalDevice();
+        bool HasGraphicsAndPresent(VkPhysicalDevice device);
         bool CreateLogicalDevice();
         bool CheckValidationLayerSupport();
 

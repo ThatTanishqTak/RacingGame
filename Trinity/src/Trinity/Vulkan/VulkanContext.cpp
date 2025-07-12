@@ -190,6 +190,29 @@ namespace Trinity
         return true;
     }
 
+    bool VulkanContext::HasGraphicsAndPresent(VkPhysicalDevice device)
+    {
+        uint32_t qCount = 0;
+        vkGetPhysicalDeviceQueueFamilyProperties(device, &qCount, nullptr);
+        std::vector<VkQueueFamilyProperties> qfs(qCount);
+        vkGetPhysicalDeviceQueueFamilyProperties(device, &qCount, qfs.data());
+
+        for (uint32_t i = 0; i < qfs.size(); ++i)
+        {
+            if (qfs[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
+            {
+                VkBool32 present = VK_FALSE;
+                vkGetPhysicalDeviceSurfaceSupportKHR(device, i, m_Surface, &present);
+                if (present)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     bool VulkanContext::PickPhysicalDevice()
     {
         uint32_t deviceCount = 0;
@@ -197,39 +220,61 @@ namespace Trinity
         if (deviceCount == 0)
         {
             TR_CORE_ERROR("Failed to find GPUs with Vulkan support");
-
+        
             return false;
         }
 
         std::vector<VkPhysicalDevice> devices(deviceCount);
         vkEnumeratePhysicalDevices(m_Instance, &deviceCount, devices.data());
 
-        for (const auto& device : devices)
+        VkPhysicalDevice bestDevice = VK_NULL_HANDLE;
+        int32_t bestScore = -1;
+
+        for (const auto& dev : devices)
         {
-            uint32_t queueFamilyCount = 0;
-            vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
-            std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
-            vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
+            VkPhysicalDeviceProperties props;
+            vkGetPhysicalDeviceProperties(dev, &props);
 
-            for (uint32_t i = 0; i < queueFamilies.size(); ++i)
+            // Skip if no graphics + present support
+            if (!HasGraphicsAndPresent(dev))
             {
-                VkBool32 presentSupport = VK_FALSE;
-                vkGetPhysicalDeviceSurfaceSupportKHR(device, i, m_Surface, &presentSupport);
+                continue;
+            }
 
-                if ((queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) && presentSupport)
-                {
-                    m_PhysicalDevice = device;
-                    TR_CORE_TRACE("Suitable graphics card found: {}");
+            // Base score: discrete GPUs get a big bonus
+            int32_t score = 0;
+            if (props.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
+            {
+                score += 1000;
+            }
 
-                    return true;
-                }
+            // Add-on: favor higher max 2D image dimension (rough proxy for power)
+            score += static_cast<int32_t>(props.limits.maxImageDimension2D / 100);
+
+            TR_CORE_TRACE("Device '{}' scored {}", props.deviceName, score);
+
+            if (score > bestScore)
+            {
+                bestScore = score;
+                bestDevice = dev;
             }
         }
 
-        TR_CORE_ERROR("Failed to find a suitable GPU");
+        if (bestDevice == VK_NULL_HANDLE)
+        {
+            TR_CORE_ERROR("Failed to find a suitable GPU");
+        
+            return false;
+        }
 
-        return false;
+        m_PhysicalDevice = bestDevice;
+        VkPhysicalDeviceProperties chosenProps;
+        vkGetPhysicalDeviceProperties(bestDevice, &chosenProps);
+        TR_CORE_TRACE("Picked GPU: {} (score {})", chosenProps.deviceName, bestScore);
+
+        return true;
     }
+
 
     bool VulkanContext::CreateLogicalDevice()
     {
