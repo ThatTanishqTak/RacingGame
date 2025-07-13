@@ -130,8 +130,9 @@ namespace Trinity
         renderPassInfo.framebuffer = m_Framebuffer->GetFramebuffers()[m_CurrentFrame];
         renderPassInfo.renderArea.offset = { 0, 0 };
         renderPassInfo.renderArea.extent = m_SwapChain->GetExtent();
+        
         VkClearValue clearColor{};
-        clearColor.color = { {0.0f, 0.0f, 0.0f, 1.0f} };
+        clearColor.color = { 0.15f, 0.15f, 0.15f, 1.0f };
         renderPassInfo.clearValueCount = 1;
         renderPassInfo.pClearValues = &clearColor;
 

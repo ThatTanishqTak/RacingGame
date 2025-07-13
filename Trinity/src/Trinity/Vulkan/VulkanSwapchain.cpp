@@ -32,6 +32,7 @@ namespace Trinity
         m_ImageAvailableSemaphores.resize(imageCount);
         m_RenderFinishedSemaphores.resize(imageCount);
         m_InFlightFences.resize(imageCount);
+        m_ImagesInFlight.resize(imageCount, VK_NULL_HANDLE);
 
         for (size_t i = 0; i < imageCount; ++i)
         {
@@ -231,6 +232,13 @@ namespace Trinity
 
             return false;
         }
+
+        if (m_ImagesInFlight[*imageIndex] != VK_NULL_HANDLE)
+        {
+            vkWaitForFences(device, 1, &m_ImagesInFlight[*imageIndex], VK_TRUE, UINT64_MAX);
+        }
+
+        m_ImagesInFlight[*imageIndex] = m_InFlightFences[frameIndex];
 
         return true;
     }
