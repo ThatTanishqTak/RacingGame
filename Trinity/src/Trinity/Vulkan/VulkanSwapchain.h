@@ -14,11 +14,12 @@ namespace Trinity
         bool Initialize(VulkanContext* context);
         void Shutdown();
 
-        bool AcquireNextImage(uint32_t* imageIndex);
-        bool PresentImage(uint32_t imageIndex);
+        bool AcquireNextImage(uint32_t* imageIndex, uint32_t frameIndex);
+        bool PresentImage(uint32_t imageIndex, uint32_t frameIndex);
 
-        VkSemaphore GetImageAvailableSemaphore() const { return m_ImageAvailableSemaphore; }
-        VkSemaphore GetRenderFinishedSemaphore() const { return m_RenderFinishedSemaphore; }
+        VkSemaphore GetImageAvailableSemaphore(uint32_t frameIndex) const { return m_ImageAvailableSemaphores[frameIndex]; }
+        VkSemaphore GetRenderFinishedSemaphore(uint32_t frameIndex) const { return m_RenderFinishedSemaphores[frameIndex]; }
+        VkFence GetInFlightFence(uint32_t frameIndex) const { return m_InFlightFences[frameIndex]; }
 
         VkSwapchainKHR GetSwapChain() const { return m_SwapChain; }
         VkFormat GetImageFormat() const { return m_ImageFormat; }
@@ -37,7 +38,8 @@ namespace Trinity
         std::vector<VkImage> m_Images;
         std::vector<VkImageView> m_ImageViews;
 
-        VkSemaphore m_ImageAvailableSemaphore = VK_NULL_HANDLE;
-        VkSemaphore m_RenderFinishedSemaphore = VK_NULL_HANDLE;
+        std::vector<VkSemaphore> m_ImageAvailableSemaphores;
+        std::vector<VkSemaphore> m_RenderFinishedSemaphores;
+        std::vector<VkFence>     m_InFlightFences;
     };
 }

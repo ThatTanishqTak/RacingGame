@@ -66,6 +66,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Trinity
 )
 
+# Link shaders to the executable
 add_dependencies(${PROJECT_NAME} 
     Shaders
 )

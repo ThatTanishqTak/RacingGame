@@ -19,14 +19,30 @@ namespace Trinity
             return false;
         }
 
+        VkDevice device = m_Context->GetDevice();
+
         VkSemaphoreCreateInfo semaphoreInfo{};
         semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-        if (vkCreateSemaphore(m_Context->GetDevice(), &semaphoreInfo, nullptr, &m_ImageAvailableSemaphore) != VK_SUCCESS ||
-            vkCreateSemaphore(m_Context->GetDevice(), &semaphoreInfo, nullptr, &m_RenderFinishedSemaphore) != VK_SUCCESS)
-        {
-            TR_CORE_ERROR("Failed to create presentation semaphores");
 
-            return false;
+        VkFenceCreateInfo fenceInfo{};
+        fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+        fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+
+        size_t imageCount = m_Images.size();
+        m_ImageAvailableSemaphores.resize(imageCount);
+        m_RenderFinishedSemaphores.resize(imageCount);
+        m_InFlightFences.resize(imageCount);
+
+        for (size_t i = 0; i < imageCount; ++i)
+        {
+            if (vkCreateSemaphore(device, &semaphoreInfo, nullptr, &m_ImageAvailableSemaphores[i]) != VK_SUCCESS ||
+                vkCreateSemaphore(device, &semaphoreInfo, nullptr, &m_RenderFinishedSemaphores[i]) != VK_SUCCESS ||
+                vkCreateFence(device, &fenceInfo, nullptr, &m_InFlightFences[i]) != VK_SUCCESS)
+            {
+                TR_CORE_ERROR("Failed to create synchronization objects for frame {}", i);
+
+                return false;
+            }
         }
 
         TR_CORE_INFO("Swap chain initialized successfully");
@@ -50,17 +66,27 @@ namespace Trinity
             m_SwapChain = VK_NULL_HANDLE;
         }
 
-        if (m_ImageAvailableSemaphore != VK_NULL_HANDLE)
+        for (size_t i = 0; i < m_ImageAvailableSemaphores.size(); ++i)
         {
-            vkDestroySemaphore(device, m_ImageAvailableSemaphore, nullptr);
-            m_ImageAvailableSemaphore = VK_NULL_HANDLE;
+            if (m_ImageAvailableSemaphores[i] != VK_NULL_HANDLE)
+            {
+                vkDestroySemaphore(device, m_ImageAvailableSemaphores[i], nullptr);
+            }
+            
+            if (m_RenderFinishedSemaphores[i] != VK_NULL_HANDLE)
+            {
+                vkDestroySemaphore(device, m_RenderFinishedSemaphores[i], nullptr);
+            }
+
+            if (m_InFlightFences[i] != VK_NULL_HANDLE)
+            {
+                vkDestroyFence(device, m_InFlightFences[i], nullptr);
+            }
         }
 
-        if (m_RenderFinishedSemaphore != VK_NULL_HANDLE)
-        {
-            vkDestroySemaphore(device, m_RenderFinishedSemaphore, nullptr);
-            m_RenderFinishedSemaphore = VK_NULL_HANDLE;
-        }
+        m_ImageAvailableSemaphores.clear();
+        m_RenderFinishedSemaphores.clear();
+        m_InFlightFences.clear();
 
         TR_CORE_INFO("Swap chain shutdown successfully");
     }
@@ -191,25 +217,30 @@ namespace Trinity
         return true;
     }
 
-    bool VulkanSwapChain::AcquireNextImage(uint32_t* imageIndex)
+    bool VulkanSwapChain::AcquireNextImage(uint32_t* imageIndex, uint32_t frameIndex)
     {
-        VkResult result = vkAcquireNextImageKHR(m_Context->GetDevice(), m_SwapChain, UINT64_MAX,
-            m_ImageAvailableSemaphore, VK_NULL_HANDLE, imageIndex);
+        VkDevice device = m_Context->GetDevice();
+
+        vkWaitForFences(device, 1, &m_InFlightFences[frameIndex], VK_TRUE, UINT64_MAX);
+        vkResetFences(device, 1, &m_InFlightFences[frameIndex]);
+
+        VkResult result = vkAcquireNextImageKHR(device, m_SwapChain, UINT64_MAX, m_ImageAvailableSemaphores[frameIndex], VK_NULL_HANDLE, imageIndex);
         if (result != VK_SUCCESS)
         {
             TR_CORE_ERROR("Failed to acquire swap chain image");
+
             return false;
         }
 
         return true;
     }
 
-    bool VulkanSwapChain::PresentImage(uint32_t imageIndex)
+    bool VulkanSwapChain::PresentImage(uint32_t imageIndex, uint32_t frameIndex)
     {
         VkPresentInfoKHR presentInfo{};
         presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
         presentInfo.waitSemaphoreCount = 1;
-        presentInfo.pWaitSemaphores = &m_RenderFinishedSemaphore;
+        presentInfo.pWaitSemaphores = &m_RenderFinishedSemaphores[frameIndex];
         presentInfo.swapchainCount = 1;
         presentInfo.pSwapchains = &m_SwapChain;
         presentInfo.pImageIndices = &imageIndex;
@@ -218,9 +249,9 @@ namespace Trinity
         if (result != VK_SUCCESS)
         {
             TR_CORE_ERROR("Failed to present swap chain image");
+
             return false;
         }
-
         return true;
     }
 }

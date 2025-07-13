@@ -34,6 +34,9 @@ namespace Trinity
         std::unique_ptr<VulkanCommandBuffer> m_CommandBuffers;
         std::unique_ptr<VulkanBuffer> m_VertexBuffer;
 
+        static constexpr uint32_t MAX_FRAMES_IN_FLIGHT = 2;
+
         uint32_t m_CurrentFrame = 0;
+        uint32_t m_FrameIndex = 0;
     };
 }

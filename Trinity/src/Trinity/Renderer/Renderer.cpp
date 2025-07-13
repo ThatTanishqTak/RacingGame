@@ -62,6 +62,7 @@ namespace Trinity
             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, vertices.data()))
         {
             TR_CORE_ERROR("Failed to create vertex buffer");
+
             return false;
         }
 
@@ -108,7 +109,7 @@ namespace Trinity
     void Renderer::BeginFrame()
     {
         uint32_t imageIndex = 0;
-        if (!m_SwapChain->AcquireNextImage(&imageIndex))
+        if (!m_SwapChain->AcquireNextImage(&imageIndex, m_FrameIndex))
         {
             return;
         }
@@ -155,7 +156,7 @@ namespace Trinity
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-        VkSemaphore waitSemaphores[] = { m_SwapChain->GetImageAvailableSemaphore() };
+        VkSemaphore waitSemaphores[] = { m_SwapChain->GetImageAvailableSemaphore(m_FrameIndex) };
         VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
         submitInfo.waitSemaphoreCount = 1;
         submitInfo.pWaitSemaphores = waitSemaphores;
@@ -164,12 +165,14 @@ namespace Trinity
         submitInfo.commandBufferCount = 1;
         submitInfo.pCommandBuffers = &commandBuffer;
 
-        VkSemaphore signalSemaphores[] = { m_SwapChain->GetRenderFinishedSemaphore() };
+        VkSemaphore signalSemaphores[] = { m_SwapChain->GetRenderFinishedSemaphore(m_FrameIndex) };
         submitInfo.signalSemaphoreCount = 1;
         submitInfo.pSignalSemaphores = signalSemaphores;
 
-        vkQueueSubmit(m_Context->GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
+        vkQueueSubmit(m_Context->GetGraphicsQueue(), 1, &submitInfo, m_SwapChain->GetInFlightFence(m_FrameIndex));
 
-        m_SwapChain->PresentImage(m_CurrentFrame);
+        m_SwapChain->PresentImage(m_CurrentFrame, m_FrameIndex);
+
+        m_FrameIndex = (m_FrameIndex + 1) % MAX_FRAMES_IN_FLIGHT;
     }
 }
