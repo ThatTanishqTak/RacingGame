@@ -21,6 +21,12 @@ target_include_directories(GLAD PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/vendor/GLAD/include>
 )
 
+# glm
+add_library(glm INTERFACE)
+target_include_directories(glm INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/vendor/glm>       
+)
+
 # Engine source files
 file(GLOB_RECURSE ENGINE_SOURCE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
@@ -41,6 +47,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 target_link_libraries(${PROJECT_NAME} PUBLIC
     GLFW
     GLAD
+    glm
 )
 if (WIN32)
     target_link_libraries(${PROJECT_NAME} PUBLIC opengl32)

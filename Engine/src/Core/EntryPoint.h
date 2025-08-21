@@ -8,7 +8,6 @@ namespace Engine
 int main()
 {
 	auto a_App = Engine::CreateApplication();
-
 	a_App->Run();
 
 	delete a_App;

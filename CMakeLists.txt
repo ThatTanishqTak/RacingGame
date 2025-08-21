@@ -3,7 +3,8 @@
 cmake_minimum_required(VERSION 3.31)
 project(RacingGame)
 
-set(CMAKE_CXX_STANDARD 20)
+# Enforce the use of C++17 across the workspace
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Add compiler options

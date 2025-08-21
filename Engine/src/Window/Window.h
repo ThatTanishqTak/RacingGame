@@ -10,11 +10,11 @@ namespace Engine
 		bool Initialize(int width, int height, const char* title);
 		void Shutdown();
 
-		bool ShouldClose() const;
+		bool WindowShouldClose() const;
 		void PollEvents() const;
 		void SwapBuffers() const;
 
-		GLFWwindow* GetNative() const { return m_Window; }
+		GLFWwindow* GetNativeWindow() const { return m_Window; }
 
 	private:
 		GLFWwindow* m_Window = nullptr;

@@ -19,10 +19,12 @@ namespace Engine
 		if (!glfwInit())
 		{
 			throw std::runtime_error("Failed to initialize GLFW");
+
+			return false;
 		}
 
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #ifdef __APPLE__
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -33,6 +35,8 @@ namespace Engine
 		{
 			glfwTerminate();
 			throw std::runtime_error("Failed to create GLFW window");
+
+			return false;
 		}
 
 		m_Width = width;
@@ -44,6 +48,8 @@ namespace Engine
 		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 		{
 			throw std::runtime_error("Failed to initialize GLAD");
+
+			return false;
 		}
 
 		glViewport(0, 0, width, height);
@@ -63,21 +69,9 @@ namespace Engine
 		glfwTerminate();
 	}
 
-	bool Window::ShouldClose() const
-	{
-		return glfwWindowShouldClose(m_Window);
-	}
+	bool Window::WindowShouldClose() const { return glfwWindowShouldClose(m_Window); }
 
-	void Window::PollEvents() const
-	{
-		glfwPollEvents();
-	}
+	void Window::PollEvents() const { glfwPollEvents(); }
 
-	void Window::SwapBuffers() const
-	{
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		glfwSwapBuffers(m_Window);
-	}
+	void Window::SwapBuffers() const { glfwSwapBuffers(m_Window); }
 }
