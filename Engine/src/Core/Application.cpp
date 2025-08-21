@@ -17,6 +17,14 @@ namespace Engine
         {
             throw std::runtime_error("Failed to initialize the renderer");
         }
+
+        m_Camera = std::make_unique<Camera>();
+        {
+            if (!m_Camera->Initialize(45.0f, 16.0f / 9.0f, 0.1f, 100.0f))
+            {
+                throw std::runtime_error("Failed to initialize the camera");
+            }
+        }
     }
 
     Application::~Application()

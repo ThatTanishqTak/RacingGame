@@ -1,4 +1,5 @@
 #include "Renderer.h"
+#include "Mesh.h"
 
 #include <glad/glad.h>
 
@@ -20,7 +21,7 @@ namespace Engine
 
     void Renderer::BeginFrame()
     {
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
@@ -31,8 +32,9 @@ namespace Engine
 
     void Renderer::DrawMesh(const Mesh& mesh, const Shader& shader, const glm::mat4& transform)
     {
-        (void)mesh;
         (void)shader;
         (void)transform;
+
+        mesh.Draw();
     }
 }
