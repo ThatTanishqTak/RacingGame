@@ -17,5 +17,9 @@ namespace Engine
         void EndFrame();
 
         void DrawMesh(const Mesh& mesh, const Shader& shader, const glm::mat4& transform);
+
+#ifndef MANAGEMENT_MODE
+        void DrawTrack();
+#endif
     };
 }

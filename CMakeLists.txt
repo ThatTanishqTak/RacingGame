@@ -7,6 +7,12 @@ project(RacingGame)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Option to disable heavy 3D track rendering for management mode
+option(ENABLE_MANAGEMENT_MODE "Disable 3D track rendering" OFF)
+if(ENABLE_MANAGEMENT_MODE)
+        add_compile_definitions(MANAGEMENT_MODE)
+endif()
+
 # Add compiler options
 if(MSVC)
 	add_compile_options(/MP)

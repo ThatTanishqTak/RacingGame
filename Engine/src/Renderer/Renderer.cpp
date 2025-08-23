@@ -37,4 +37,11 @@ namespace Engine
 
         mesh.Draw();
     }
+
+#ifndef MANAGEMENT_MODE
+    void Renderer::DrawTrack()
+    {
+        // Placeholder for track rendering; disabled in management mode
+    }
+#endif
 }
