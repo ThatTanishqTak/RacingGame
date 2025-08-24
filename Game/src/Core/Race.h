@@ -8,6 +8,13 @@ class Driver;
 class Circuit;
 class Team;
 
+enum class SessionType
+{
+    Practice,
+    Qualifying,
+    Race
+};
+
 struct SessionResult
 {
     std::shared_ptr<Driver> Driver;
@@ -24,6 +31,9 @@ private:
     std::vector<SessionResult> QualifyingResults;
     std::vector<SessionResult> RaceResults;
 
+    SessionType CurrentSession;
+    bool ParcFerme;
+
     std::vector<SessionResult> GenerateResults(const std::vector<std::shared_ptr<Driver>>& drivers);
 
 public:
@@ -31,6 +41,9 @@ public:
 
     const std::shared_ptr<Circuit>& GetCircuit() const;
     const std::string& GetDate() const;
+    SessionType GetCurrentSession() const;
+    bool IsParcFerme() const;
+
 
     std::vector<SessionResult> ConductPractice(const std::vector<std::shared_ptr<Driver>>& drivers);
     std::vector<SessionResult> ConductQualifying(const std::vector<std::shared_ptr<Driver>>& drivers);

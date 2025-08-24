@@ -9,20 +9,18 @@
 #include <limits>
 #include <random>
 
-Race::Race(const std::shared_ptr<Circuit>& circuit, const std::string& date) : Track(circuit), Date(date)
+Race::Race(const std::shared_ptr<Circuit>& circuit, const std::string& date) : Track(circuit), Date(date), CurrentSession(SessionType::Practice), ParcFerme(false)
 {
 
 }
 
-const std::shared_ptr<Circuit>& Race::GetCircuit() const
-{
-    return Track;
-}
+const std::shared_ptr<Circuit>& Race::GetCircuit() const { return Track; }
 
-const std::string& Race::GetDate() const
-{
-    return Date;
-}
+const std::string& Race::GetDate() const { return Date; }
+
+SessionType Race::GetCurrentSession() const { return CurrentSession; }
+
+bool Race::IsParcFerme() const { return ParcFerme; }
 
 std::vector<SessionResult> Race::GenerateResults(const std::vector<std::shared_ptr<Driver>>& drivers)
 {
@@ -45,30 +43,59 @@ std::vector<SessionResult> Race::GenerateResults(const std::vector<std::shared_p
 
 std::vector<SessionResult> Race::ConductPractice(const std::vector<std::shared_ptr<Driver>>& drivers)
 {
+    if (CurrentSession != SessionType::Practice || ParcFerme)
+    {
+        return PracticeResults;
+    }
+
     PracticeResults = GenerateResults(drivers);
+    CurrentSession = SessionType::Qualifying;
 
     return PracticeResults;
 }
 
 std::vector<SessionResult> Race::ConductQualifying(const std::vector<std::shared_ptr<Driver>>& drivers)
 {
+    if (CurrentSession != SessionType::Qualifying)
+    {
+        return QualifyingResults;
+    }
+
     QualifyingResults = GenerateResults(drivers);
+    ParcFerme = true;
+    CurrentSession = SessionType::Race;
 
     return QualifyingResults;
 }
 
 std::vector<SessionResult> Race::ConductRace(const std::vector<std::shared_ptr<Team>>& teams)
 {
+    if (CurrentSession != SessionType::Race)
+    {
+        return RaceResults;
+    }
+
     RaceEventManager manager;
     manager.LoadFromJson("Game/Assets/Events.json");
 
     const int laps = 5;
 
     std::vector<std::shared_ptr<Driver>> drivers;
-    for (const auto& team : teams)
+    if (!QualifyingResults.empty())
     {
-        const auto& teamDrivers = team->GetDrivers();
-        drivers.insert(drivers.end(), teamDrivers.begin(), teamDrivers.end());
+        for (const auto& result : QualifyingResults)
+        {
+            drivers.push_back(result.Driver);
+        }
+    }
+
+    else
+    {
+        for (const auto& team : teams)
+        {
+            const auto& teamDrivers = team->GetDrivers();
+            drivers.insert(drivers.end(), teamDrivers.begin(), teamDrivers.end());
+        }
     }
 
     std::vector<CarEventState> carStates(drivers.size());
