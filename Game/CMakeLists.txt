@@ -10,6 +10,8 @@ file(GLOB_RECURSE GAME_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h
 )
 
+list(FILTER GAME_SOURCES EXCLUDE REGEX "Tests.cpp$")
+
 # Build .exe
 add_executable(${PROJECT_NAME} ${GAME_SOURCES})
 
