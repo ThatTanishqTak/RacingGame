@@ -14,7 +14,7 @@ namespace Engine
 		ImGui::CreateContext();
 		ImGui::StyleColorsDark();
 
-		if (!ImGui_ImplGlfw_InitForOpenGL(window, true))
+		if (!ImGui_ImplGlfw_InitForOpenGL(window, false))
 		{
 			throw std::runtime_error("Failed to initialize imgui glfw backend");
 		}

@@ -12,6 +12,7 @@ public:
         GameLayer layer;
         while (!m_Window->WindowShouldClose())
         {
+            m_ImGuiLayer->BeginFrame();
             m_Renderer->BeginFrame();
 
             layer.Render();
@@ -21,6 +22,8 @@ public:
 #endif
 
             m_Renderer->EndFrame();
+            m_ImGuiLayer->EndFrame();
+
             m_Window->SwapBuffers();
             m_Window->PollEvents();
         }

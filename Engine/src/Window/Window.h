@@ -14,6 +14,9 @@ namespace Engine
 		void PollEvents() const;
 		void SwapBuffers() const;
 
+		bool IsKeyPressed(int key) const;
+		bool IsMouseButtonPressed(int button) const;
+
 		GLFWwindow* GetNativeWindow() const { return m_Window; }
 
 	private:
