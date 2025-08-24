@@ -33,14 +33,28 @@ file(GLOB_RECURSE ENGINE_SOURCE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h
 )
 
+# ImGui
+file(GLOB_RECURSE IMGUI_SOURCE
+    ${CMAKE_CURRENT_SOURCE_DIR}/vendor/imgui/*.cpp    
+    ${CMAKE_CURRENT_SOURCE_DIR}/vendor/imgui/backends/imgui_impl_glfw.cpp    
+    ${CMAKE_CURRENT_SOURCE_DIR}/vendor/imgui/backends/imgui_impl_opengl3.cpp    
+)
+
 # Build .lib
 add_library(${PROJECT_NAME} STATIC 
     ${ENGINE_SOURCE}
+    ${IMGUI_SOURCE}
 )
 
 # Include directory
 target_include_directories(${PROJECT_NAME} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/vendor/imgui>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/vendor/imgui/backends>
+)
+
+target_compile_definitions(${PROJECT_NAME} PUBLIC
+    IMGUI_IMPL_OPENGL_LOADER_GLAD    
 )
 
 # Link libraries

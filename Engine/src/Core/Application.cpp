@@ -18,6 +18,12 @@ namespace Engine
             throw std::runtime_error("Failed to initialize the renderer");
         }
 
+        m_ImGuiLayer = std::make_unique<ImGuiLayer>();
+        if (!m_ImGuiLayer->Initialize(m_Window->GetNativeWindow()))
+        {
+            throw std::runtime_error("Failed to initialize the imgui layer");
+        }
+
         m_Camera = std::make_unique<Camera>();
         {
             if (!m_Camera->Initialize(45.0f, 16.0f / 9.0f, 0.1f, 100.0f))
@@ -29,6 +35,7 @@ namespace Engine
 
     Application::~Application()
     {
+        m_ImGuiLayer->Shutdown();
         m_Renderer->Shutdown();
         m_Window->Shutdown();
     }
