@@ -1,6 +1,8 @@
 #pragma once
 
-#include <iostream>
+#ifdef MANAGEMENT_MODE
+
+#include <imgui.h>
 #include <string>
 
 class HudPanel
@@ -16,7 +18,9 @@ public:
     explicit BudgetPanel(float budget) : m_Budget(budget) {}
     void Render() override
     {
-        std::cout << "Budget: $" << m_Budget << '\n';
+        ImGui::Begin("Budget");
+        ImGui::Text("Budget: $%.2f", m_Budget);
+        ImGui::End();
     }
 private:
     float m_Budget;
@@ -28,7 +32,9 @@ public:
     explicit StaffPanel(int staff) : m_StaffCount(staff) {}
     void Render() override
     {
-        std::cout << "Staff: " << m_StaffCount << '\n';
+        ImGui::Begin("Staff");
+        ImGui::Text("Staff: %d", m_StaffCount);
+        ImGui::End();
     }
 private:
     int m_StaffCount;
@@ -40,7 +46,9 @@ public:
     explicit RaceCalendarPanel(const std::string& nextRace) : m_NextRace(nextRace) {}
     void Render() override
     {
-        std::cout << "Next Race: " << m_NextRace << '\n';
+        ImGui::Begin("Race Calendar");
+        ImGui::Text("Next Race: %s", m_NextRace.c_str());
+        ImGui::End();
     }
 private:
     std::string m_NextRace;
@@ -52,7 +60,9 @@ public:
     explicit LiveSessionPanel(int lap) : m_CurrentLap(lap) {}
     void Render() override
     {
-        std::cout << "Lap: " << m_CurrentLap << '\n';
+        ImGui::Begin("Live Session");
+        ImGui::Text("Lap: %d", m_CurrentLap);
+        ImGui::End();
     }
 private:
     int m_CurrentLap;
@@ -69,3 +79,14 @@ private:
     RaceCalendarPanel m_RaceCalendar;
     LiveSessionPanel m_LiveSession;
 };
+
+#else
+
+class HUD
+{
+public:
+    HUD() = default;
+    void Render() {}
+};
+
+#endif

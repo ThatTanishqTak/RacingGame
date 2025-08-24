@@ -2,6 +2,8 @@
 
 project(Game LANGUAGES CXX)
 
+add_compile_definitions(MANAGEMENT_MODE)
+
 # Game source files
 file(GLOB_RECURSE GAME_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
