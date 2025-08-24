@@ -34,10 +34,14 @@ file(GLOB_RECURSE ENGINE_SOURCE
 )
 
 # ImGui
-file(GLOB_RECURSE IMGUI_SOURCE
-    ${CMAKE_CURRENT_SOURCE_DIR}/vendor/imgui/*.cpp    
-    ${CMAKE_CURRENT_SOURCE_DIR}/vendor/imgui/backends/imgui_impl_glfw.cpp    
-    ${CMAKE_CURRENT_SOURCE_DIR}/vendor/imgui/backends/imgui_impl_opengl3.cpp    
+set(IMGUI_SOURCE
+    ${CMAKE_CURRENT_SOURCE_DIR}/vendor/imgui/imgui.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/vendor/imgui/imgui_demo.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/vendor/imgui/imgui_draw.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/vendor/imgui/imgui_tables.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/vendor/imgui/imgui_widgets.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/vendor/imgui/backends/imgui_impl_glfw.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/vendor/imgui/backends/imgui_impl_opengl3.cpp
 )
 
 # Build .lib
