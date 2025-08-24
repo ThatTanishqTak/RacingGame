@@ -2,6 +2,8 @@
 #include "Circuit.h"
 #include "Driver.h"
 #include "RaceEventManager.h"
+#include "Team.h"
+#include "StrategyPlanner.h"
 
 #include <algorithm>
 #include <limits>
@@ -55,12 +57,19 @@ std::vector<SessionResult> Race::ConductQualifying(const std::vector<std::shared
     return QualifyingResults;
 }
 
-std::vector<SessionResult> Race::ConductRace(const std::vector<std::shared_ptr<Driver>>& drivers)
+std::vector<SessionResult> Race::ConductRace(const std::vector<std::shared_ptr<Team>>& teams)
 {
     RaceEventManager manager;
     manager.LoadFromJson("Game/Assets/Events.json");
 
     const int laps = 5;
+
+    std::vector<std::shared_ptr<Driver>> drivers;
+    for (const auto& team : teams)
+    {
+        const auto& teamDrivers = team->GetDrivers();
+        drivers.insert(drivers.end(), teamDrivers.begin(), teamDrivers.end());
+    }
 
     std::vector<CarEventState> carStates(drivers.size());
     std::vector<double> totalTimes(drivers.size(), 0.0);
@@ -68,10 +77,25 @@ std::vector<SessionResult> Race::ConductRace(const std::vector<std::shared_ptr<D
     std::mt19937 rng{ std::random_device{}() };
     std::uniform_real_distribution<double> dist(60.0, 120.0);
 
+    StrategyPlanner planner;
+
     for (int lap = 0; lap < laps; ++lap)
     {
         TrackFlag flag = TrackFlag::Green;
         manager.EvaluateLap(carStates, flag);
+
+        for (const auto& team : teams)
+        {
+            planner.UpdateERSMode(*team);
+            if (flag == TrackFlag::Green)
+            {
+                planner.PlanPitStops(*team, lap, laps, rng);
+            }
+            else
+            {
+                planner.ReplanForSafetyCar(*team, flag, lap, laps);
+            }
+        }
 
         for (size_t i = 0; i < drivers.size(); ++i)
         {
@@ -81,6 +105,10 @@ std::vector<SessionResult> Race::ConductRace(const std::vector<std::shared_ptr<D
                 if (flag == TrackFlag::SafetyCar)
                 {
                     lapTime *= 1.1;
+                }
+                else if (flag == TrackFlag::VirtualSafetyCar)
+                {
+                    lapTime *= 1.05;
                 }
                 totalTimes[i] += lapTime;
             }

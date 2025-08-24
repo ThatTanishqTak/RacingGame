@@ -8,7 +8,8 @@
 enum class TrackFlag
 {
     Green,
-    SafetyCar
+    SafetyCar,
+    VirtualSafetyCar
 };
 
 struct CarEventState

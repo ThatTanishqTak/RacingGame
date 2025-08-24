@@ -57,7 +57,8 @@ void SafetyCarEvent::Execute(std::mt19937& rng, TrackFlag& flag, std::vector<Car
     std::uniform_real_distribution<double> dist(0.0, 1.0);
     if (dist(rng) < Probability)
     {
-        flag = TrackFlag::SafetyCar;
+        std::bernoulli_distribution chooseVSC(0.5);
+        flag = chooseVSC(rng) ? TrackFlag::VirtualSafetyCar : TrackFlag::SafetyCar;
     }
 }
 
