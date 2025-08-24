@@ -1,8 +1,10 @@
 #include "Race.h"
 #include "Circuit.h"
 #include "Driver.h"
+#include "RaceEventManager.h"
 
 #include <algorithm>
+#include <limits>
 #include <random>
 
 Race::Race(const std::shared_ptr<Circuit>& circuit, const std::string& date) : Track(circuit), Date(date)
@@ -55,7 +57,47 @@ std::vector<SessionResult> Race::ConductQualifying(const std::vector<std::shared
 
 std::vector<SessionResult> Race::ConductRace(const std::vector<std::shared_ptr<Driver>>& drivers)
 {
-    RaceResults = GenerateResults(drivers);
+    RaceEventManager manager;
+    manager.LoadFromJson("Game/Assets/Events.json");
+
+    const int laps = 5;
+
+    std::vector<CarEventState> carStates(drivers.size());
+    std::vector<double> totalTimes(drivers.size(), 0.0);
+
+    std::mt19937 rng{ std::random_device{}() };
+    std::uniform_real_distribution<double> dist(60.0, 120.0);
+
+    for (int lap = 0; lap < laps; ++lap)
+    {
+        TrackFlag flag = TrackFlag::Green;
+        manager.EvaluateLap(carStates, flag);
+
+        for (size_t i = 0; i < drivers.size(); ++i)
+        {
+            if (!carStates[i].Retired)
+            {
+                double lapTime = dist(rng);
+                if (flag == TrackFlag::SafetyCar)
+                {
+                    lapTime *= 1.1;
+                }
+                totalTimes[i] += lapTime;
+            }
+        }
+    }
+
+    RaceResults.clear();
+    for (size_t i = 0; i < drivers.size(); ++i)
+    {
+        double t = carStates[i].Retired ? std::numeric_limits<double>::infinity() : totalTimes[i];
+        RaceResults.push_back({ drivers[i], t });
+    }
+
+    std::sort(RaceResults.begin(), RaceResults.end(), [](const SessionResult& a, const SessionResult& b)
+        {
+            return a.Time < b.Time;
+        });
 
     return RaceResults;
 }

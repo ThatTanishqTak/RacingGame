@@ -1,0 +1,8 @@
+{
+    "SafetyCar": {
+        "probability": 0.05
+    },
+    "MechanicalFailure": {
+        "probability": 0.02
+    }
+}
