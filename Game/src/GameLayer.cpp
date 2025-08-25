@@ -1,10 +1,15 @@
 #include "GameLayer.h"
+
 #include "Core/SessionManager.h"
 #include "Core/Circuit.h"
 #include "Core/Driver.h"
 #include "Core/Team.h"
 
 #include <memory>
+#include <vector>
+#ifndef MANAGEMENT_MODE
+#include <glm/glm.hpp>
+#endif
 
 void GameLayer::Render()
 {
@@ -24,6 +29,11 @@ void GameLayer::Render()
     manager.RunPractice();
     manager.RunQualifying();
     manager.RunRace();
+
+#ifndef MANAGEMENT_MODE
+    std::vector<glm::vec2> carPositions{ {0.0f, 0.0f}, {50.0f, 20.0f} };
+    m_HUD.SetCarPositions(carPositions);
+#endif
 
     m_HUD.Render();
 }

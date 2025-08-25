@@ -16,11 +16,19 @@ private:
 
 #else
 
+#include <vector>
+#include <glm/glm.hpp>
+#include "Renderer/TrackRenderer.h"
+
 class HUD
 {
 public:
-    HUD() = default;
-    void Render() {}
+    HUD();
+    void SetCarPositions(const std::vector<glm::vec2>& positions);
+    void Render();
+
+private:
+    Engine::TrackRenderer m_TrackRenderer;
 };
 
 #endif
