@@ -38,19 +38,92 @@ void RaceCalendarPanel::Render()
     ImGui::End();
 }
 
-LiveSessionPanel::LiveSessionPanel(int lap) : m_CurrentLap(lap)
+PitCrewPanel::PitCrewPanel()
+{
+
+}
+
+void PitCrewPanel::Render()
+{
+    ImGui::Text("Pit crew ready");
+}
+
+RaceViewPanel::RaceViewPanel()
+{
+
+}
+
+void RaceViewPanel::Render()
+{
+    ImGui::Text("Race view placeholder");
+}
+
+StandingsPanel::StandingsPanel()
+{
+
+}
+
+void StandingsPanel::Render()
+{
+    ImGui::Text("1. Driver A");
+    ImGui::Text("2. Driver B");
+    ImGui::Text("3. Driver C");
+}
+
+DriverInfoPanel::DriverInfoPanel(const std::string& driverName) : m_DriverName(driverName)
+{
+
+}
+
+void DriverInfoPanel::Render()
+{
+    ImGui::Text("%s", m_DriverName.c_str());
+    ImGui::Text("Lap Time: --:--");
+}
+
+LiveSessionPanel::LiveSessionPanel() : m_DriverOne("Driver 1"), m_DriverTwo("Driver 2")
 {
 
 }
 
 void LiveSessionPanel::Render()
 {
-    ImGui::Begin("Live Session");
-    ImGui::Text("Lap: %d", m_CurrentLap);
+    ImGuiIO& io = ImGui::GetIO();
+    const float sideWidth = 200.0f;
+    const float driverHeight = 150.0f;
+    const float mainWidth = io.DisplaySize.x - 2.0f * sideWidth;
+    const float mainHeight = io.DisplaySize.y - driverHeight;
+
+    ImGui::Begin("Live Session", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
+
+    ImGui::SetCursorPos(ImVec2(0.0f, 0.0f));
+    ImGui::BeginChild("PitCrew", ImVec2(sideWidth, mainHeight), true);
+    m_PitCrew.Render();
+    ImGui::EndChild();
+
+    ImGui::SetCursorPos(ImVec2(sideWidth, 0.0f));
+    ImGui::BeginChild("RaceView", ImVec2(mainWidth, mainHeight), true);
+    m_RaceView.Render();
+    ImGui::EndChild();
+
+    ImGui::SetCursorPos(ImVec2(sideWidth + mainWidth, 0.0f));
+    ImGui::BeginChild("Standings", ImVec2(sideWidth, io.DisplaySize.y), true);
+    m_Standings.Render();
+    ImGui::EndChild();
+
+    ImGui::SetCursorPos(ImVec2(sideWidth, mainHeight));
+    ImGui::BeginChild("DriverOne", ImVec2(mainWidth / 2.0f, driverHeight), true);
+    m_DriverOne.Render();
+    ImGui::EndChild();
+
+    ImGui::SetCursorPos(ImVec2(sideWidth + mainWidth / 2.0f, mainHeight));
+    ImGui::BeginChild("DriverTwo", ImVec2(mainWidth / 2.0f, driverHeight), true);
+    m_DriverTwo.Render();
+    ImGui::EndChild();
     ImGui::End();
 }
 
-UIManager::UIManager() : m_CurrentState(UIState::Budget), m_Budget(1000000.0f), m_Staff(50), m_RaceCalendar("Monaco GP"), m_LiveSession(1)
+UIManager::UIManager() : m_CurrentState(UIState::Budget), m_Budget(1000000.0f), m_Staff(50), m_RaceCalendar("Monaco GP"), m_LiveSession()
 {
 
 }

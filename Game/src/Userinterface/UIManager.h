@@ -44,14 +44,49 @@ private:
     std::string m_NextRace;
 };
 
-class LiveSessionPanel : public HUDPanel
+class PitCrewPanel : public HUDPanel
 {
 public:
-    explicit LiveSessionPanel(int lap);
+    PitCrewPanel();
+    void Render() override;
+};
+
+class RaceViewPanel : public HUDPanel
+{
+public:
+    RaceViewPanel();
+    void Render() override;
+};
+
+class StandingsPanel : public HUDPanel
+{
+public:
+    StandingsPanel();
+    void Render() override;
+};
+
+class DriverInfoPanel : public HUDPanel
+{
+public:
+    explicit DriverInfoPanel(const std::string& driverName);
     void Render() override;
 
 private:
-    int m_CurrentLap;
+    std::string m_DriverName;
+};
+
+class LiveSessionPanel : public HUDPanel
+{
+public:
+    LiveSessionPanel();
+    void Render() override;
+
+private:
+    PitCrewPanel m_PitCrew;
+    RaceViewPanel m_RaceView;
+    StandingsPanel m_Standings;
+    DriverInfoPanel m_DriverOne;
+    DriverInfoPanel m_DriverTwo;
 };
 
 class UIManager
