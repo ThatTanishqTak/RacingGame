@@ -2,5 +2,5 @@
 
 void GameLayer::Render()
 {
-    m_HUD.Render();
+
 }
