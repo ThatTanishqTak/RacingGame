@@ -70,8 +70,12 @@ void RaceDashboard::RenderTrackViewPanel(const RaceState& state)
 
         if (!state.TrackLayout.empty())
         {
-            float l_TileWidth = l_CanvasSize.x / static_cast<float>(state.TrackLayout[0].size());
-            float l_TileHeight = l_CanvasSize.y / static_cast<float>(state.TrackLayout.size());
+            float l_LayoutWidth = static_cast<float>(state.TrackLayout[0].size());
+            float l_LayoutHeight = static_cast<float>(state.TrackLayout.size());
+            float l_TileWidth = (l_CanvasSize.x / l_LayoutWidth) * m_TrackZoom;
+            float l_TileHeight = (l_CanvasSize.y / l_LayoutHeight) * m_TrackZoom;
+            ImVec2 l_TrackSize = ImVec2(l_TileWidth * l_LayoutWidth, l_TileHeight * l_LayoutHeight);
+            ImVec2 l_Origin = ImVec2(l_CanvasPosition.x + (l_CanvasSize.x - l_TrackSize.x) * 0.5f, l_CanvasPosition.y + (l_CanvasSize.y - l_TrackSize.y) * 0.5f);
 
             for (size_t y = 0; y < state.TrackLayout.size(); ++y)
             {
@@ -106,7 +110,7 @@ void RaceDashboard::RenderTrackViewPanel(const RaceState& state)
 
                     if (l_Draw)
                     {
-                        ImVec2 l_Minimum = ImVec2(l_CanvasPosition.x + x * l_TileWidth, l_CanvasPosition.y + y * l_TileHeight);
+                        ImVec2 l_Minimum = ImVec2(l_Origin.x + x * l_TileWidth, l_Origin.y + y * l_TileHeight);
                         ImVec2 l_Maximum = ImVec2(l_Minimum.x + l_TileWidth, l_Minimum.y + l_TileHeight);
 
                         l_DrawList->AddRectFilled(l_Minimum, l_Maximum, l_Colour);
@@ -116,6 +120,15 @@ void RaceDashboard::RenderTrackViewPanel(const RaceState& state)
         }
 
         ImGui::InvisibleButton("canvas", l_CanvasSize);
+        if (ImGui::IsItemHovered())
+        {
+            float l_Wheel = ImGui::GetIO().MouseWheel;
+            if (l_Wheel != 0.0f)
+            {
+                m_TrackZoom += l_Wheel * 0.1f;
+                m_TrackZoom = std::clamp(m_TrackZoom, 0.5f, 3.0f);
+            }
+        }
     }
     ImGui::End();
 }

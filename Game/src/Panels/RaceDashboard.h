@@ -23,4 +23,5 @@ private:
 private:
     std::vector<std::string> m_Toasts;
     bool m_ColourBlindMode = false;
+    float m_TrackZoom = 1.0f;
 };
