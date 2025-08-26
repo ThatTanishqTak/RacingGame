@@ -9,8 +9,8 @@ namespace Engine
         m_Camera = camera;
 
         glm::vec3 l_Position = m_Camera->GetPosition();
-        m_TargetPan = { l_Position.x, l_Position.y };
-        m_TargetZoom = l_Position.z;
+        m_TargetPan = { l_Position.x, l_Position.z };
+        m_TargetZoom = l_Position.y;
 
         return true;
     }
@@ -25,13 +25,13 @@ namespace Engine
         }
 
         glm::vec3 l_Position = m_Camera->GetPosition();
-        glm::vec2 l_Pan{ l_Position.x, l_Position.y };
+        glm::vec2 l_Pan{ l_Position.x, l_Position.z };
 
         l_Pan = SmoothDamp(l_Pan, m_TargetPan, m_PanVelocity, m_PanSmoothTime, deltaTime);
         l_Position.x = l_Pan.x;
-        l_Position.y = l_Pan.y;
+        l_Position.z = l_Pan.y;
 
-        l_Position.z = SmoothDamp(l_Position.z, m_TargetZoom, m_ZoomVelocity, m_ZoomSmoothTime, deltaTime);
+        l_Position.y = SmoothDamp(l_Position.y, m_TargetZoom, m_ZoomVelocity, m_ZoomSmoothTime, deltaTime);
         m_Camera->SetPosition(l_Position);
 
         ClampToTrack();
@@ -121,13 +121,26 @@ namespace Engine
         glm::vec3 l_Position = m_Camera->GetPosition();
         glm::mat4 l_Projection = m_Camera->GetProjectionMatrix();
 
-        float l_Fov = 2.0f * glm::atan(1.0f / l_Projection[1][1]);
-        float l_Aspect = l_Projection[1][1] / l_Projection[0][0];
-        float l_HalfHeight = glm::tan(l_Fov * 0.5f) * l_Position.z;
-        float l_HalfWidth = l_HalfHeight * l_Aspect;
+        float l_HalfWidth = 0.0f;
+        float l_HalfHeight = 0.0f;
+
+        bool l_IsPerspective = glm::abs(l_Projection[3][3]) < 0.5f;
+        if (l_IsPerspective)
+        {
+            float l_Fov = 2.0f * glm::atan(1.0f / l_Projection[1][1]);
+            float l_Aspect = l_Projection[1][1] / l_Projection[0][0];
+            l_HalfHeight = glm::tan(l_Fov * 0.5f) * l_Position.y;
+            l_HalfWidth = l_HalfHeight * l_Aspect;
+        }
+
+        else
+        {
+            l_HalfWidth = 1.0f / l_Projection[0][0];
+            l_HalfHeight = 1.0f / l_Projection[1][1];
+        }
 
         l_Position.x = glm::clamp(l_Position.x, m_TrackMin.x + l_HalfWidth, m_TrackMax.x - l_HalfWidth);
-        l_Position.y = glm::clamp(l_Position.y, m_TrackMin.y + l_HalfHeight, m_TrackMax.y - l_HalfHeight);
+        l_Position.z = glm::clamp(l_Position.z, m_TrackMin.y + l_HalfHeight, m_TrackMax.y - l_HalfHeight);
 
         m_Camera->SetPosition(l_Position);
     }
