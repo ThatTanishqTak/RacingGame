@@ -1,6 +1,6 @@
 # ------- WORKSPACE -------
 
-cmake_minimum_required(VERSION 3.31)
+cmake_minimum_required(VERSION 3.28)
 project(RacingGame)
 
 # Enforce the use of C++17 across the workspace

@@ -21,6 +21,7 @@ target_link_options(${PROJECT_NAME} PRIVATE
 
 # Inlcude directory of the engine
 target_include_directories(${PROJECT_NAME}
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
     PRIVATE ${CMAKE_SOURCE_DIR}/Engine/src
 )
 
