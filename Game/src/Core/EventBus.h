@@ -14,8 +14,8 @@ public:
     template<typename Event>
     void Subscribe(const Handler<Event>& handler)
     {
-        auto& handlers = Subscribers[typeid(Event)];
-        handlers.push_back([handler](const void* e) { handler(*static_cast<const Event*>(e)); });
+        auto& a_Handlers = Subscribers[typeid(Event)];
+        a_Handlers.push_back([handler](const void* e) { handler(*static_cast<const Event*>(e)); });
     }
 
     template<typename Event>
@@ -27,9 +27,9 @@ public:
             return;
         }
 
-        for (auto& handler : it->second)
+        for (auto& it_Handler : it->second)
         {
-            handler(&event);
+            it_Handler(&event);
         }
     }
 

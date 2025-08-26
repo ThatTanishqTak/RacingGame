@@ -12,8 +12,8 @@ namespace Engine
 	{
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
-		ImGuiIO& io = ImGui::GetIO();
-		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+		ImGuiIO& IO = ImGui::GetIO();
+		IO.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 		ImGui::StyleColorsDark();
 
 		if (!ImGui_ImplGlfw_InitForOpenGL(window, false))

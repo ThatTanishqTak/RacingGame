@@ -94,8 +94,8 @@ namespace Engine
 
     bool Window::IsKeyPressed(int key) const
     {
-        ImGuiIO& io = ImGui::GetIO();
-        if (io.WantCaptureKeyboard)
+        ImGuiIO& IO = ImGui::GetIO();
+        if (IO.WantCaptureKeyboard)
         {
             return false;
         }
@@ -105,8 +105,8 @@ namespace Engine
 
     bool Window::IsMouseButtonPressed(int button) const
     {
-        ImGuiIO& io = ImGui::GetIO();
-        if (io.WantCaptureMouse)
+        ImGuiIO& IO = ImGui::GetIO();
+        if (IO.WantCaptureMouse)
         {
             return false;
         }

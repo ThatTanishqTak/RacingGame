@@ -24,6 +24,7 @@ namespace Engine
         l_Front.x = cos(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
         l_Front.y = sin(glm::radians(m_Pitch));
         l_Front.z = sin(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
+
         glm::vec3 l_Direction = glm::normalize(l_Front);
 
         return glm::lookAt(m_Position, m_Position + l_Direction, glm::vec3(0.0f, 1.0f, 0.0f));

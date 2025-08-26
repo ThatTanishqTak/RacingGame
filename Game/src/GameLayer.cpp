@@ -13,30 +13,30 @@ void GameLayer::Update()
 
 void GameLayer::Render()
 {
-    static RaceDashboard Dashboard;
-    static TimingTowerPanel TimingTower;
-    static FlagPanel Flags;
-    static Circuit Track("Sample Track", 5.0);
-    static bool LayoutLoaded = false;
+    static RaceDashboard l_Dashboard;
+    static TimingTowerPanel l_TimingTower;
+    static FlagPanel l_Flags;
+    static Circuit l_Track("Sample l_Track", 5.0);
+    static bool l_LayoutLoaded = false;
 
-    if (!LayoutLoaded)
+    if (!l_LayoutLoaded)
     {
-        Track.LoadLayout("Game/Assets/Tracks/SampleTrack.txt");
-        LayoutLoaded = true;
+        l_Track.LoadLayout("Assets/Tracks/SampleTrack.txt");
+        l_LayoutLoaded = true;
     }
 
-    RaceState State;
-    State.Date = "18-10-2025";
-    State.Time = "12:00";
-    State.Weather = "Clear";
-    State.Drivers.push_back({ "Alice", 1, 0 });
-    State.Drivers.push_back({ "Bob", 2, 1 });
-    State.Positions = { 1, 2 };
-    State.Intervals = { 0.0f, 1.2f };
-    State.FlagStatus = "Green";
-    State.TrackLayout = Track.GetLayout();
+    RaceState l_State;
+    l_State.Date = "18-10-2025";
+    l_State.Time = "12:00";
+    l_State.Weather = "Clear";
+    l_State.Drivers.push_back({ "Alice", 1, 0 });
+    l_State.Drivers.push_back({ "Bob", 2, 1 });
+    l_State.Positions = { 1, 2 };
+    l_State.Intervals = { 0.0f, 1.2f };
+    l_State.FlagStatus = "Green";
+    l_State.TrackLayout = l_Track.GetLayout();
 
-    Dashboard.Render(State);
-    TimingTower.Render(State);
-    Flags.Render(State);
+    l_Dashboard.Render(l_State);
+    l_TimingTower.Render(l_State);
+    l_Flags.Render(l_State);
 }

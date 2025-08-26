@@ -25,21 +25,21 @@ const std::string& Race::GetDate() const
 
 std::vector<SessionResult> Race::GenerateResults(const std::vector<std::shared_ptr<Driver>>& drivers)
 {
-    std::vector<SessionResult> results;
-    std::mt19937 rng{ std::random_device{}() };
-    std::uniform_real_distribution<double> dist(60.0, 120.0);
+    std::vector<SessionResult> l_Results;
+    std::mt19937 l_randomNumber{ std::random_device{}() };
+    std::uniform_real_distribution<double> l_distribution(60.0, 120.0);
 
-    for (const auto& driver : drivers)
+    for (const auto& it_Driver : drivers)
     {
-        results.push_back({ driver, dist(rng) });
+        l_Results.push_back({ it_Driver, l_distribution(l_randomNumber) });
     }
 
-    std::sort(results.begin(), results.end(), [](const SessionResult& a, const SessionResult& b)
+    std::sort(l_Results.begin(), l_Results.end(), [](const SessionResult& a, const SessionResult& b)
         {
             return a.Time < b.Time;
         });
 
-    return results;
+    return l_Results;
 }
 
 std::vector<SessionResult> Race::ConductPractice(const std::vector<std::shared_ptr<Driver>>& drivers)
@@ -60,20 +60,21 @@ std::vector<SessionResult> Race::ConductRace(const std::vector<std::shared_ptr<D
 {
     RaceResults = GenerateResults(drivers);
 
-    std::mt19937 rng{ std::random_device{}() };
-    std::uniform_real_distribution<double> dist(0.0, 1.0);
+    std::mt19937 l_randomNumber{ std::random_device{}() };
+    std::uniform_real_distribution<double> l_distribution(0.0, 1.0);
 
-    for (const auto& driver : drivers)
+    for (const auto& it_Driver : drivers)
     {
-        double chance = dist(rng);
-        if (chance < 0.1)
+        double l_Chance = l_distribution(l_randomNumber);
+        if (l_Chance < 0.1)
         {
-            g_EventBus.Publish(PitIn{ driver->GetName() });
-            g_EventBus.Publish(PitOut{ driver->GetName() });
+            g_EventBus.Publish(PitIn{ it_Driver->GetName() });
+            g_EventBus.Publish(PitOut{ it_Driver->GetName() });
         }
-        else if (chance < 0.15)
+
+        else if (l_Chance < 0.15)
         {
-            g_EventBus.Publish(DNF{ driver->GetName(), "mechanical failure" });
+            g_EventBus.Publish(DNF{ it_Driver->GetName(), "mechanical failure" });
         }
     }
 

@@ -67,11 +67,11 @@ namespace Engine
         DrawTrack();
 #endif
 
-        double time = glfwGetTime();
-        auto states = GlobalStateBuffer.Interpolate(time);
-        for (const auto& car : states)
+        double l_Time = glfwGetTime();
+        auto a_States = g_StateBuffer.Interpolate(l_Time);
+        for (const auto& it_Car : a_States)
         {
-            glm::mat4 l_Transform = glm::translate(glm::mat4(1.0f), car.Position);
+            glm::mat4 l_Transform = glm::translate(glm::mat4(1.0f), it_Car.Position);
             glm::vec4 l_CarColour(1.0f, 0.5f, 0.2f, 1.0f);
 
             DrawMesh(*m_CarMesh, *m_Shader, l_Transform, l_CarColour);

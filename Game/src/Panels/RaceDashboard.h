@@ -21,6 +21,6 @@ private:
     void RenderSettingsPanel();
 
 private:
-    std::vector<std::string> Toasts;
-    bool ColourBlindMode = false;
+    std::vector<std::string> m_Toasts;
+    bool m_ColourBlindMode = false;
 };

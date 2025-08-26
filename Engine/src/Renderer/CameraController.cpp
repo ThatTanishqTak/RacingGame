@@ -7,9 +7,10 @@ namespace Engine
     bool CameraController::Initialize(Camera* camera)
     {
         m_Camera = camera;
-        glm::vec3 l_Pos = m_Camera->GetPosition();
-        m_TargetPan = { l_Pos.x, l_Pos.y };
-        m_TargetZoom = l_Pos.z;
+
+        glm::vec3 l_Position = m_Camera->GetPosition();
+        m_TargetPan = { l_Position.x, l_Position.y };
+        m_TargetZoom = l_Position.z;
 
         return true;
     }
@@ -23,14 +24,15 @@ namespace Engine
             m_TargetPan = m_CarPositionProvider(m_SelectedCarId);
         }
 
-        glm::vec3 l_Pos = m_Camera->GetPosition();
-        glm::vec2 l_Pan{ l_Pos.x, l_Pos.y };
-        l_Pan = SmoothDamp(l_Pan, m_TargetPan, m_PanVelocity, m_PanSmoothTime, deltaTime);
-        l_Pos.x = l_Pan.x;
-        l_Pos.y = l_Pan.y;
+        glm::vec3 l_Position = m_Camera->GetPosition();
+        glm::vec2 l_Pan{ l_Position.x, l_Position.y };
 
-        l_Pos.z = SmoothDamp(l_Pos.z, m_TargetZoom, m_ZoomVelocity, m_ZoomSmoothTime, deltaTime);
-        m_Camera->SetPosition(l_Pos);
+        l_Pan = SmoothDamp(l_Pan, m_TargetPan, m_PanVelocity, m_PanSmoothTime, deltaTime);
+        l_Position.x = l_Pan.x;
+        l_Position.y = l_Pan.y;
+
+        l_Position.z = SmoothDamp(l_Position.z, m_TargetZoom, m_ZoomVelocity, m_ZoomSmoothTime, deltaTime);
+        m_Camera->SetPosition(l_Position);
 
         ClampToTrack();
     }
@@ -40,9 +42,9 @@ namespace Engine
         m_Mode = mode;
         if (m_Mode == Mode::FitAll && m_Camera)
         {
-            glm::mat4 l_Proj = m_Camera->GetProjectionMatrix();
-            float l_Fov = 2.0f * glm::atan(1.0f / l_Proj[1][1]);
-            float l_Aspect = l_Proj[1][1] / l_Proj[0][0];
+            glm::mat4 l_Projection = m_Camera->GetProjectionMatrix();
+            float l_Fov = 2.0f * glm::atan(1.0f / l_Projection[1][1]);
+            float l_Aspect = l_Projection[1][1] / l_Projection[0][0];
 
             glm::vec2 l_Center = (m_TrackMin + m_TrackMax) * 0.5f;
             float l_Width = m_TrackMax.x - m_TrackMin.x;
@@ -86,24 +88,27 @@ namespace Engine
     {
         float l_Omega = 2.0f / smoothTime;
         float l_X = l_Omega * deltaTime;
-        float l_Exp = 1.0f / (1.0f + l_X + 0.48f * l_X * l_X + 0.235f * l_X * l_X * l_X);
+        float l_Exponent = 1.0f / (1.0f + l_X + 0.48f * l_X * l_X + 0.235f * l_X * l_X * l_X);
+
         glm::vec2 l_Change = current - target;
         glm::vec2 l_Temp = (velocity + l_Omega * l_Change) * deltaTime;
-        velocity = (velocity - l_Omega * l_Temp) * l_Exp;
+        
+        velocity = (velocity - l_Omega * l_Temp) * l_Exponent;
 
-        return target + (l_Change + l_Temp) * l_Exp;
+        return target + (l_Change + l_Temp) * l_Exponent;
     }
 
     float CameraController::SmoothDamp(float current, float target, float& velocity, float smoothTime, float deltaTime)
     {
         float l_Omega = 2.0f / smoothTime;
         float l_X = l_Omega * deltaTime;
-        float l_Exp = 1.0f / (1.0f + l_X + 0.48f * l_X * l_X + 0.235f * l_X * l_X * l_X);
+        float l_Exponent = 1.0f / (1.0f + l_X + 0.48f * l_X * l_X + 0.235f * l_X * l_X * l_X);
         float l_Change = current - target;
         float l_Temp = (velocity + l_Omega * l_Change) * deltaTime;
-        velocity = (velocity - l_Omega * l_Temp) * l_Exp;
 
-        return target + (l_Change + l_Temp) * l_Exp;
+        velocity = (velocity - l_Omega * l_Temp) * l_Exponent;
+
+        return target + (l_Change + l_Temp) * l_Exponent;
     }
 
     void CameraController::ClampToTrack()
@@ -113,17 +118,17 @@ namespace Engine
             return;
         }
 
-        glm::vec3 l_Pos = m_Camera->GetPosition();
-        glm::mat4 l_Proj = m_Camera->GetProjectionMatrix();
+        glm::vec3 l_Position = m_Camera->GetPosition();
+        glm::mat4 l_Projection = m_Camera->GetProjectionMatrix();
 
-        float l_Fov = 2.0f * glm::atan(1.0f / l_Proj[1][1]);
-        float l_Aspect = l_Proj[1][1] / l_Proj[0][0];
-        float l_HalfHeight = glm::tan(l_Fov * 0.5f) * l_Pos.z;
+        float l_Fov = 2.0f * glm::atan(1.0f / l_Projection[1][1]);
+        float l_Aspect = l_Projection[1][1] / l_Projection[0][0];
+        float l_HalfHeight = glm::tan(l_Fov * 0.5f) * l_Position.z;
         float l_HalfWidth = l_HalfHeight * l_Aspect;
 
-        l_Pos.x = glm::clamp(l_Pos.x, m_TrackMin.x + l_HalfWidth, m_TrackMax.x - l_HalfWidth);
-        l_Pos.y = glm::clamp(l_Pos.y, m_TrackMin.y + l_HalfHeight, m_TrackMax.y - l_HalfHeight);
+        l_Position.x = glm::clamp(l_Position.x, m_TrackMin.x + l_HalfWidth, m_TrackMax.x - l_HalfWidth);
+        l_Position.y = glm::clamp(l_Position.y, m_TrackMin.y + l_HalfHeight, m_TrackMax.y - l_HalfHeight);
 
-        m_Camera->SetPosition(l_Pos);
+        m_Camera->SetPosition(l_Position);
     }
 }

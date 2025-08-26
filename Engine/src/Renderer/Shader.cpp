@@ -74,38 +74,68 @@ namespace Engine
         glDeleteShader(l_FragmentShader);
     }
 
-    Shader::~Shader() { glDeleteProgram(m_RendererID); }
+    Shader::~Shader()
+    {
+        glDeleteProgram(m_RendererID);
+    }
 
-    void Shader::Bind() const { glUseProgram(m_RendererID); }
+    void Shader::Bind() const
+    {
+        glUseProgram(m_RendererID);
+    }
 
-    void Shader::Unbind() const { glUseProgram(0); }
+    void Shader::Unbind() const
+    {
+        glUseProgram(0);
+    }
 
-    void Shader::SetUniformMat2(const std::string& name, const glm::mat2& matrix) const { glUniformMatrix2fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(matrix)); }
+    void Shader::SetUniformMat2(const std::string& name, const glm::mat2& matrix) const
+    {
+        glUniformMatrix2fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(matrix));
+    }
     
-    void Shader::SetUniformMat3(const std::string& name, const glm::mat3& matrix) const { glUniformMatrix3fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(matrix)); }
+    void Shader::SetUniformMat3(const std::string& name, const glm::mat3& matrix) const
+    {
+        glUniformMatrix3fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(matrix));
+    }
 
-    void Shader::SetUniformMat4(const std::string& name, const glm::mat4& matrix) const { glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(matrix)); }
+    void Shader::SetUniformMat4(const std::string& name, const glm::mat4& matrix) const
+    {
+        glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(matrix));
+    }
 
-    void Shader::SetUniformVec2(const std::string& name, const glm::vec2& vector) const { glUniform2fv(GetUniformLocation(name), 1, glm::value_ptr(vector)); }
+    void Shader::SetUniformVec2(const std::string& name, const glm::vec2& vector) const
+    {
+        glUniform2fv(GetUniformLocation(name), 1, glm::value_ptr(vector));
+    }
 
-    void Shader::SetUniformVec3(const std::string& name, const glm::vec3& vector) const { glUniform3fv(GetUniformLocation(name), 1, glm::value_ptr(vector)); }
+    void Shader::SetUniformVec3(const std::string& name, const glm::vec3& vector) const
+    {
+        glUniform3fv(GetUniformLocation(name), 1, glm::value_ptr(vector));
+    }
 
-    void Shader::SetUniformVec4(const std::string& name, const glm::vec4& vector) const { glUniform4fv(GetUniformLocation(name), 1, glm::value_ptr(vector)); }
+    void Shader::SetUniformVec4(const std::string& name, const glm::vec4& vector) const
+    {
+        glUniform4fv(GetUniformLocation(name), 1, glm::value_ptr(vector));
+    }
 
-    void Shader::SetUniformFloat(const std::string& name, float value) const { glUniform1f(GetUniformLocation(name), value); }
+    void Shader::SetUniformFloat(const std::string& name, float value) const
+    {
+        glUniform1f(GetUniformLocation(name), value);
+    }
 
     int Shader::GetUniformLocation(const std::string& name) const
     {
-        auto a_It = m_UniformLocationCache.find(name);
-        if (a_It != m_UniformLocationCache.end())
+        auto it = m_UniformLocationCache.find(name);
+        if (it != m_UniformLocationCache.end())
         {
-            return a_It->second;
+            return it->second;
         }
 
-        GLint location = glGetUniformLocation(m_RendererID, name.c_str());
-        m_UniformLocationCache[name] = location;
+        GLint l_Location = glGetUniformLocation(m_RendererID, name.c_str());
+        m_UniformLocationCache[name] = l_Location;
 
-        return location;
+        return l_Location;
     }
 
     ShaderLibrary& ShaderLibrary::Get()
@@ -125,10 +155,10 @@ namespace Engine
 
     std::shared_ptr<Shader> ShaderLibrary::Get(const std::string& name) const
     {
-        auto a_It = m_Shaders.find(name);
-        if (a_It != m_Shaders.end())
+        auto it = m_Shaders.find(name);
+        if (it != m_Shaders.end())
         {
-            return a_It->second;
+            return it->second;
         }
         
         return nullptr;

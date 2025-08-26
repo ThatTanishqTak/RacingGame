@@ -20,12 +20,12 @@ namespace Engine
     class StateBuffer
     {
     private:
-        std::vector<Snapshot> Snapshots;
+        std::vector<Snapshot> m_Snapshots;
 
     public:
         void SubmitSnapshot(const Snapshot& snapshot);
         std::vector<CarState> Interpolate(double tRender) const;
     };
 
-    extern StateBuffer GlobalStateBuffer;
+    extern StateBuffer g_StateBuffer;
 }

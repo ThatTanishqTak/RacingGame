@@ -17,17 +17,17 @@ public:
     void Run() override
     {
         double l_Start = glfwGetTime();
-        Engine::GlobalStateBuffer.SubmitSnapshot({ l_Start, { { 0, { 0.0f, 0.0f, 0.0f } }, { 1, { 2.0f, 0.0f, 0.0f } } } });
-        Engine::GlobalStateBuffer.SubmitSnapshot({ l_Start + 5.0, { { 0, { 0.0f, 0.0f, -10.0f } }, { 1, { 2.0f, 0.0f, -10.0f } } } });
+        Engine::g_StateBuffer.SubmitSnapshot({ l_Start, { { 0, { 0.0f, 0.0f, 0.0f } }, { 1, { 2.0f, 0.0f, 0.0f } } } });
+        Engine::g_StateBuffer.SubmitSnapshot({ l_Start + 5.0, { { 0, { 0.0f, 0.0f, -10.0f } }, { 1, { 2.0f, 0.0f, -10.0f } } } });
 
-        GameLayer layer;
+        GameLayer l_Layer;
         while (!m_Window->WindowShouldClose())
         {
             m_ImGuiLayer->BeginFrame();
             m_Renderer->BeginFrame();
 
-            layer.Update();
-            layer.Render();
+            l_Layer.Update();
+            l_Layer.Render();
 
             m_Renderer->EndFrame();
             m_ImGuiLayer->EndFrame();

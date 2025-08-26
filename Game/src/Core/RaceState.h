@@ -7,20 +7,9 @@ struct DriverInfo
 {
     std::string Name;
     int Number;
-    int TeamId;
+    int TeamID;
 };
 
-struct RaceState
-{
-    std::string Date;
-    std::string Time;
-    std::string Weather;
-    std::vector<DriverInfo> Drivers;
-    std::vector<int> Positions;
-    std::vector<float> Intervals;
-    std::string FlagStatus;
-    std::vector<std::string> TrackLayout;
-};
 
 struct PitIn
 {
@@ -42,4 +31,16 @@ struct Overtake
 {
     std::string Overtaker;
     std::string Overtaken;
+};
+
+struct RaceState
+{
+    std::string Date;
+    std::string Time;
+    std::string Weather;
+    std::vector<DriverInfo> Drivers;
+    std::vector<int> Positions;
+    std::vector<float> Intervals;
+    std::string FlagStatus;
+    std::vector<std::string> TrackLayout;
 };

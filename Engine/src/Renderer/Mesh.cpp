@@ -4,18 +4,28 @@
 
 namespace Engine
 {
-    Mesh::Mesh(const std::vector<float>& l_Vertices, const std::vector<uint32_t>& l_Indices) : m_Vertices(l_Vertices), m_Indices(l_Indices), m_VBO(0), m_EBO(0), m_VAO(0), m_Transform(1.0f)
+    Mesh::Mesh(const std::vector<float>& l_Vertices, const std::vector<uint32_t>& l_Indices) : m_Vertices(l_Vertices), m_Indices(l_Indices), m_VBO(0), m_EBO(0), 
+            m_VAO(0), m_Transform(1.0f)
     {
         SetupMesh();
     }
 
     Mesh::~Mesh()
     {
-        if (m_VBO) { glDeleteBuffers(1, &m_VBO); }
+        if (m_VBO)
+        { 
+            glDeleteBuffers(1, &m_VBO); 
+        }
 
-        if (m_EBO) { glDeleteBuffers(1, &m_EBO); }
+        if (m_EBO)
+        {
+            glDeleteBuffers(1, &m_EBO);
+        }
 
-        if (m_VAO) { glDeleteVertexArrays(1, &m_VAO); }
+        if (m_VAO)
+        {
+            glDeleteVertexArrays(1, &m_VAO);
+        }
     }
 
     void Mesh::Draw() const
@@ -59,9 +69,15 @@ namespace Engine
         return nullptr;
     }
 
-    void Mesh::SetTransform(const glm::mat4& transform) { m_Transform = transform; }
+    void Mesh::SetTransform(const glm::mat4& transform)
+    {
+        m_Transform = transform;
+    }
 
-    const glm::mat4& Mesh::GetTransform() const { return m_Transform; }
+    const glm::mat4& Mesh::GetTransform() const
+    {
+        return m_Transform;
+    }
 
     void Mesh::SetupMesh()
     {

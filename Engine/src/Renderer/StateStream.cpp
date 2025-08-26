@@ -4,74 +4,74 @@
 
 namespace Engine
 {
-    StateBuffer GlobalStateBuffer;
+    StateBuffer g_StateBuffer;
 
     void StateBuffer::SubmitSnapshot(const Snapshot& snapshot)
     {
-        auto it = std::lower_bound(Snapshots.begin(), Snapshots.end(), snapshot.Time, [](const Snapshot& s, double time) { return s.Time < time; });
-        Snapshots.insert(it, snapshot);
+        auto it = std::lower_bound(m_Snapshots.begin(), m_Snapshots.end(), snapshot.Time, [](const Snapshot& s, double time) { return s.Time < time; });
+        m_Snapshots.insert(it, snapshot);
     }
 
     std::vector<CarState> StateBuffer::Interpolate(double tRender) const
     {
-        if (Snapshots.empty())
+        if (m_Snapshots.empty())
         {
             return {};
         }
 
-        if (Snapshots.size() == 1)
+        if (m_Snapshots.size() == 1)
         {
-            return Snapshots.front().Cars;
+            return m_Snapshots.front().Cars;
         }
 
-        if (tRender <= Snapshots.front().Time)
+        if (tRender <= m_Snapshots.front().Time)
         {
-            const Snapshot& s0 = Snapshots.front();
-            const Snapshot& s1 = Snapshots[1];
-            double dt = s1.Time - s0.Time;
-            std::vector<CarState> result = s0.Cars;
-            if (dt > 0.0)
+            const Snapshot& l_Snapshot0 = m_Snapshots.front();
+            const Snapshot& l_Snapshot1 = m_Snapshots[1];
+            double l_DeltaTime = l_Snapshot1.Time - l_Snapshot0.Time;
+            std::vector<CarState> l_Result = l_Snapshot0.Cars;
+            if (l_DeltaTime > 0.0)
             {
-                double alpha = (tRender - s0.Time) / dt;
-                for (std::size_t i = 0; i < result.size() && i < s1.Cars.size(); ++i)
+                double l_Alpha = (tRender - l_Snapshot0.Time) / l_DeltaTime;
+                for (std::size_t i = 0; i < l_Result.size() && i < l_Snapshot1.Cars.size(); ++i)
                 {
-                    result[i].Position += (s1.Cars[i].Position - result[i].Position) * static_cast<float>(alpha);
+                    l_Result[i].Position += (l_Snapshot1.Cars[i].Position - l_Result[i].Position) * static_cast<float>(l_Alpha);
                 }
             }
 
-            return result;
+            return l_Result;
         }
 
-        if (tRender >= Snapshots.back().Time)
+        if (tRender >= m_Snapshots.back().Time)
         {
-            const Snapshot& s0 = Snapshots[Snapshots.size() - 2];
-            const Snapshot& s1 = Snapshots.back();
-            double dt = s1.Time - s0.Time;
-            std::vector<CarState> result = s1.Cars;
-            if (dt > 0.0)
+            const Snapshot& l_Snapshot0 = m_Snapshots[m_Snapshots.size() - 2];
+            const Snapshot& l_Snapshot1 = m_Snapshots.back();
+            double l_DeltaTime = l_Snapshot1.Time - l_Snapshot0.Time;
+            std::vector<CarState> l_Result = l_Snapshot1.Cars;
+            if (l_DeltaTime > 0.0)
             {
-                double alpha = (tRender - s1.Time) / dt;
-                for (std::size_t i = 0; i < result.size() && i < s0.Cars.size(); ++i)
+                double l_Alpha = (tRender - l_Snapshot1.Time) / l_DeltaTime;
+                for (std::size_t i = 0; i < l_Result.size() && i < l_Snapshot0.Cars.size(); ++i)
                 {
-                    result[i].Position += (s1.Cars[i].Position - s0.Cars[i].Position) * static_cast<float>(alpha);
+                    l_Result[i].Position += (l_Snapshot1.Cars[i].Position - l_Snapshot0.Cars[i].Position) * static_cast<float>(l_Alpha);
                 }
             }
 
-            return result;
+            return l_Result;
         }
 
-        auto it = std::upper_bound(Snapshots.begin(), Snapshots.end(), tRender, [](double time, const Snapshot& s) { return time < s.Time; });
-        const Snapshot& s0 = *(it - 1);
-        const Snapshot& s1 = *it;
-        double dt = s1.Time - s0.Time;
-        double alpha = (tRender - s0.Time) / dt;
+        auto it = std::upper_bound(m_Snapshots.begin(), m_Snapshots.end(), tRender, [](double time, const Snapshot& s) { return time < s.Time; });
+        const Snapshot& l_Snapshot0 = *(it - 1);
+        const Snapshot& l_Snapshot1 = *it;
+        double l_DeltaTime = l_Snapshot1.Time - l_Snapshot0.Time;
+        double l_Alpha = (tRender - l_Snapshot0.Time) / l_DeltaTime;
 
-        std::vector<CarState> result = s0.Cars;
-        for (std::size_t i = 0; i < result.size() && i < s1.Cars.size(); ++i)
+        std::vector<CarState> l_Result = l_Snapshot0.Cars;
+        for (std::size_t i = 0; i < l_Result.size() && i < l_Snapshot1.Cars.size(); ++i)
         {
-            result[i].Position += (s1.Cars[i].Position - result[i].Position) * static_cast<float>(alpha);
+            l_Result[i].Position += (l_Snapshot1.Cars[i].Position - l_Result[i].Position) * static_cast<float>(l_Alpha);
         }
 
-        return result;
+        return l_Result;
     }
 }

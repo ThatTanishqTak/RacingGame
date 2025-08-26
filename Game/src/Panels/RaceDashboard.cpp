@@ -10,9 +10,9 @@
 
 RaceDashboard::RaceDashboard()
 {
-    g_EventBus.Subscribe<PitIn>([this](const PitIn& e) { Toasts.push_back(e.DriverName + " entered pit"); });
-    g_EventBus.Subscribe<PitOut>([this](const PitOut& e) { Toasts.push_back(e.DriverName + " exited pit"); });
-    g_EventBus.Subscribe<DNF>([this](const DNF& e) { Toasts.push_back(e.DriverName + " DNF: " + e.Reason); });
+    g_EventBus.Subscribe<PitIn>([this](const PitIn& e) { m_Toasts.push_back(e.DriverName + " entered pit"); });
+    g_EventBus.Subscribe<PitOut>([this](const PitOut& e) { m_Toasts.push_back(e.DriverName + " exited pit"); });
+    g_EventBus.Subscribe<DNF>([this](const DNF& e) { m_Toasts.push_back(e.DriverName + " DNF: " + e.Reason); });
 }
 
 void RaceDashboard::Render(const RaceState& state)
@@ -52,68 +52,70 @@ void RaceDashboard::RenderTrackViewPanel(const RaceState& state)
 {
     if (ImGui::Begin("Track View"))
     {
-        ImVec2 canvasSize = ImGui::GetContentRegionAvail();
-        if (canvasSize.x < 50.0f)
+        ImVec2 l_CanvasSize = ImGui::GetContentRegionAvail();
+        if (l_CanvasSize.x < 50.0f)
         {
-            canvasSize.x = 50.0f;
+            l_CanvasSize.x = 50.0f;
         }
 
-        if (canvasSize.y < 50.0f)
+        if (l_CanvasSize.y < 50.0f)
         {
-            canvasSize.y = 50.0f;
+            l_CanvasSize.y = 50.0f;
         }
 
-        ImVec2 canvasPos = ImGui::GetCursorScreenPos();
-        ImDrawList* drawList = ImGui::GetWindowDrawList();
-        drawList->AddRectFilled(canvasPos, ImVec2(canvasPos.x + canvasSize.x, canvasPos.y + canvasSize.y), IM_COL32(30, 30, 30, 255));
-        drawList->AddRect(canvasPos, ImVec2(canvasPos.x + canvasSize.x, canvasPos.y + canvasSize.y), IM_COL32(255, 255, 255, 255));
+        ImVec2 l_CanvasPosition = ImGui::GetCursorScreenPos();
+        ImDrawList* l_DrawList = ImGui::GetWindowDrawList();
+        l_DrawList->AddRectFilled(l_CanvasPosition, ImVec2(l_CanvasPosition.x + l_CanvasSize.x, l_CanvasPosition.y + l_CanvasSize.y), IM_COL32(30, 30, 30, 255));
+        l_DrawList->AddRect(l_CanvasPosition, ImVec2(l_CanvasPosition.x + l_CanvasSize.x, l_CanvasPosition.y + l_CanvasSize.y), IM_COL32(255, 255, 255, 255));
 
         if (!state.TrackLayout.empty())
         {
-            float tileWidth = canvasSize.x / static_cast<float>(state.TrackLayout[0].size());
-            float tileHeight = canvasSize.y / static_cast<float>(state.TrackLayout.size());
+            float l_TileWidth = l_CanvasSize.x / static_cast<float>(state.TrackLayout[0].size());
+            float l_TileHeight = l_CanvasSize.y / static_cast<float>(state.TrackLayout.size());
 
             for (size_t y = 0; y < state.TrackLayout.size(); ++y)
             {
                 for (size_t x = 0; x < state.TrackLayout[y].size(); ++x)
                 {
-                    char tile = state.TrackLayout[y][x];
-                    ImU32 colour;
-                    bool draw = true;
-                    switch (tile)
+                    char l_Tile = state.TrackLayout[y][x];
+                    ImU32 l_Colour;
+                    bool l_Draw = true;
+
+                    switch (l_Tile)
                     {
                     case '-':
                     case '|':
                     case '\\':
                     case '/':
-                        colour = IM_COL32(100, 100, 100, 255);
+                        l_Colour = IM_COL32(100, 100, 100, 255);
                         break;
                     case '*':
-                        colour = IM_COL32(255, 255, 255, 255);
+                        l_Colour = IM_COL32(255, 255, 255, 255);
                         break;
                     case '&':
-                        colour = IM_COL32(0, 0, 255, 255);
+                        l_Colour = IM_COL32(0, 0, 255, 255);
                         break;
                     case '[':
                     case ']':
-                        colour = IM_COL32(0, 255, 0, 255);
+                        l_Colour = IM_COL32(0, 255, 0, 255);
                         break;
                     default:
-                        draw = false;
+                        l_Draw = false;
                         break;
                     }
 
-                    if (draw)
+                    if (l_Draw)
                     {
-                        ImVec2 min = ImVec2(canvasPos.x + x * tileWidth, canvasPos.y + y * tileHeight);
-                        ImVec2 max = ImVec2(min.x + tileWidth, min.y + tileHeight);
-                        drawList->AddRectFilled(min, max, colour);
+                        ImVec2 l_Minimum = ImVec2(l_CanvasPosition.x + x * l_TileWidth, l_CanvasPosition.y + y * l_TileHeight);
+                        ImVec2 l_Maximum = ImVec2(l_Minimum.x + l_TileWidth, l_Minimum.y + l_TileHeight);
+
+                        l_DrawList->AddRectFilled(l_Minimum, l_Maximum, l_Colour);
                     }
                 }
             }
         }
 
-        ImGui::InvisibleButton("canvas", canvasSize);
+        ImGui::InvisibleButton("canvas", l_CanvasSize);
     }
     ImGui::End();
 }
@@ -122,10 +124,10 @@ void RaceDashboard::RenderDriverPanels(const RaceState& state)
 {
     if (ImGui::Begin("Drivers"))
     {
-        for (const auto& driver : state.Drivers) 
+        for (const auto& it_driver : state.Drivers) 
         {
-            ImVec4 colour = g_PaletteManager.GetTeamColour(driver.TeamId, ColourBlindMode);
-            ImGui::TextColored(colour, "Driver %d: %s", driver.Number, driver.Name.c_str());
+            ImVec4 l_Colour = g_PaletteManager.GetTeamColour(it_driver.TeamID, m_ColourBlindMode);
+            ImGui::TextColored(l_Colour, "Driver %d: %s", it_driver.Number, it_driver.Name.c_str());
         }
     }
     ImGui::End();
@@ -135,16 +137,16 @@ void RaceDashboard::RenderScoreboardPanel(const RaceState& state)
 {
     if (ImGui::Begin("Positions")) 
     {
-        int position = 1;
-        for (int pos : state.Positions) 
+        int l_Position = 1;
+        for (int it_Position : state.Positions) 
         {
-            auto it = std::find_if(state.Drivers.begin(), state.Drivers.end(), [pos](const DriverInfo& d) { return d.Number == pos; });
-            ImVec4 colour = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+            auto it = std::find_if(state.Drivers.begin(), state.Drivers.end(), [it_Position](const DriverInfo& d) { return d.Number == it_Position; });
+            ImVec4 l_Colour = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
             if (it != state.Drivers.end()) 
             {
-                colour = g_PaletteManager.GetTeamColour(it->TeamId, ColourBlindMode);
+                l_Colour = g_PaletteManager.GetTeamColour(it->TeamID, m_ColourBlindMode);
             }
-            ImGui::TextColored(colour, "%d: %d", position++, pos);
+            ImGui::TextColored(l_Colour, "%d: %d", l_Position++, it_Position);
         }
     }
     ImGui::End();
@@ -154,9 +156,9 @@ void RaceDashboard::RenderToasts()
 {
     if (ImGui::Begin("HUD Toasts")) 
     {
-        for (const auto& msg : Toasts) 
+        for (const auto& it_message : m_Toasts) 
         {
-            ImGui::Text("%s", msg.c_str());
+            ImGui::Text("%s", it_message.c_str());
         }
     }
     ImGui::End();
@@ -166,7 +168,7 @@ void RaceDashboard::RenderSettingsPanel()
 {
     if (ImGui::Begin("Settings")) 
     {
-        ImGui::Checkbox("Colour Blind Mode", &ColourBlindMode);
+        ImGui::Checkbox("Colour Blind Mode", &m_ColourBlindMode);
     }
     ImGui::End();
 }

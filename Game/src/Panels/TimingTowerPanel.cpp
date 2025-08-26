@@ -7,27 +7,28 @@ void TimingTowerPanel::Render(const RaceState& state)
 {
     if (ImGui::Begin("Timing Tower"))
     {
-        ImFont* font = ImGui::GetFont();
-        float scale = /*font && font->SetWindowFontScale() < 12.0f ? 12.0f / font->FontSize :*/ 1.0f;
-        ImGui::SetWindowFontScale(scale);
+        ImFont* l_Font = ImGui::GetFont();
+        float l_Scale = /*l_Font && l_Font->SetWindowFontScale() < 12.0f ? 12.0f / l_Font->FontSize :*/ 1.0f;
+        ImGui::SetWindowFontScale(l_Scale);
 
-        int position = 1;
+        int l_Position = 1;
         for (size_t i = 0; i < state.Positions.size(); ++i)
         {
-            int carNumber = state.Positions[i];
-            const DriverInfo* driver = nullptr;
-            for (const auto& d : state.Drivers)
+            int l_CarNumber = state.Positions[i];
+            const DriverInfo* l_Driver = nullptr;
+            for (const auto& it_Driver : state.Drivers)
             {
-                if (d.Number == carNumber)
+                if (it_Driver.Number == l_CarNumber)
                 {
-                    driver = &d;
+                    l_Driver = &it_Driver;
                     break;
                 }
             }
 
-            std::string driverCode = driver ? driver->Name.substr(0, 3) : std::to_string(carNumber);
-            float interval = i < state.Intervals.size() ? state.Intervals[i] : 0.0f;
-            ImGui::Text("%d %s %.3fs", position++, driverCode.c_str(), interval);
+            std::string l_DriverCode = l_Driver ? l_Driver->Name.substr(0, 3) : std::to_string(l_CarNumber);
+            float l_Interval = i < state.Intervals.size() ? state.Intervals[i] : 0.0f;
+
+            ImGui::Text("%it_Driver %s %.3fs", l_Position++, l_DriverCode.c_str(), l_Interval);
         }
 
         ImGui::SetWindowFontScale(1.0f);
