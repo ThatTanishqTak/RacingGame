@@ -12,6 +12,8 @@ namespace Engine
 	{
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO();
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 		ImGui::StyleColorsDark();
 
 		if (!ImGui_ImplGlfw_InitForOpenGL(window, false))
@@ -39,6 +41,7 @@ namespace Engine
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
+		ImGui::DockSpaceOverViewport((ImGuiID)ImGui::GetMainViewport());
 	}
 
 	void ImGuiLayer::EndFrame()

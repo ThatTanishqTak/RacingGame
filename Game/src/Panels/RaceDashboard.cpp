@@ -13,8 +13,8 @@ void RaceDashboard::Render(const RaceState& state)
 
 void RaceDashboard::RenderPitCrewPanel(const RaceState& state)
 {
-    ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f));
-    ImGui::SetNextWindowSize(ImVec2(200.0f, 600.0f));
+    ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(200.0f, 600.0f), ImGuiCond_FirstUseEver);
     if (ImGui::Begin("Pit Crew"))
     {
         ImGui::Text("Pit Crew Panel");
@@ -24,8 +24,8 @@ void RaceDashboard::RenderPitCrewPanel(const RaceState& state)
 
 void RaceDashboard::RenderRaceInfoPanel(const RaceState& state)
 {
-    ImGui::SetNextWindowPos(ImVec2(200.0f, 0.0f));
-    ImGui::SetNextWindowSize(ImVec2(800.0f, 80.0f));
+    ImGui::SetNextWindowPos(ImVec2(200.0f, 0.0f), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(800.0f, 80.0f), ImGuiCond_FirstUseEver);
     if (ImGui::Begin("Race Info"))
     {
         ImGui::Text("Date: %s", state.Date.c_str());
@@ -37,8 +37,8 @@ void RaceDashboard::RenderRaceInfoPanel(const RaceState& state)
 
 void RaceDashboard::RenderTrackViewPanel(const RaceState& state)
 {
-    ImGui::SetNextWindowPos(ImVec2(200.0f, 80.0f));
-    ImGui::SetNextWindowSize(ImVec2(800.0f, 400.0f));
+    ImGui::SetNextWindowPos(ImVec2(200.0f, 80.0f), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(800.0f, 400.0f), ImGuiCond_FirstUseEver);
     if (ImGui::Begin("Track View"))
     {
         ImGui::Text("Track View Panel");
@@ -48,8 +48,8 @@ void RaceDashboard::RenderTrackViewPanel(const RaceState& state)
 
 void RaceDashboard::RenderDriverPanels(const RaceState& state)
 {
-    ImGui::SetNextWindowPos(ImVec2(200.0f, 480.0f));
-    ImGui::SetNextWindowSize(ImVec2(800.0f, 120.0f));
+    ImGui::SetNextWindowPos(ImVec2(200.0f, 480.0f), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(800.0f, 120.0f), ImGuiCond_FirstUseEver);
     if (ImGui::Begin("Drivers"))
     {
         for (const auto& driver : state.DriverInfo)
@@ -62,9 +62,9 @@ void RaceDashboard::RenderDriverPanels(const RaceState& state)
 
 void RaceDashboard::RenderScoreboardPanel(const RaceState& state)
 {
-    ImGui::SetNextWindowPos(ImVec2(1000.0f, 0.0f));
-    ImGui::SetNextWindowSize(ImVec2(200.0f, 600.0f));
-    if (ImGui::Begin("Scoreboard"))
+    ImGui::SetNextWindowPos(ImVec2(1000.0f, 0.0f), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(200.0f, 600.0f), ImGuiCond_FirstUseEver);
+    if (ImGui::Begin("Positions"))
     {
         int position = 1;
         for (int pos : state.Positions)
