@@ -29,9 +29,9 @@ public:
             layer.Update();
             layer.Render();
 
-#ifndef MANAGEMENT_MODE
-            m_Renderer->DrawTrack();
-#endif
+//#ifndef MANAGEMENT_MODE
+//            m_Renderer->DrawTrack();
+//#endif
 
             m_Renderer->EndFrame();
             m_ImGuiLayer->EndFrame();

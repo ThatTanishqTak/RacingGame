@@ -63,12 +63,18 @@ namespace Engine
         glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+#ifndef MANAGEMENT_MODE
+        DrawTrack();
+#endif
+
         double time = glfwGetTime();
         auto states = GlobalStateBuffer.Interpolate(time);
         for (const auto& car : states)
         {
             glm::mat4 l_Transform = glm::translate(glm::mat4(1.0f), car.Position);
-            DrawMesh(*m_CarMesh, *m_Shader, l_Transform);
+            glm::vec4 l_CarColour(1.0f, 0.5f, 0.2f, 1.0f);
+
+            DrawMesh(*m_CarMesh, *m_Shader, l_Transform, l_CarColour);
         }
     }
 
@@ -77,7 +83,7 @@ namespace Engine
 
     }
 
-    void Renderer::DrawMesh(const Mesh& mesh, const Shader& shader, const glm::mat4& transform)
+    void Renderer::DrawMesh(const Mesh& mesh, const Shader& shader, const glm::mat4& transform, const glm::vec4& colour)
     {
         if (!m_Camera)
         {
@@ -85,8 +91,11 @@ namespace Engine
         }
 
         shader.Bind();
+        
         glm::mat4 l_MVP = m_Camera->GetProjectionMatrix() * m_Camera->GetViewMatrix() * transform;
         shader.SetUniformMat4("u_MVP", l_MVP);
+        shader.SetUniformVec4("u_Color", colour);
+
         mesh.Draw();
     }
 
@@ -99,7 +108,9 @@ namespace Engine
         }
 
         glm::mat4 l_Transform = glm::mat4(1.0f);
-        DrawMesh(*m_TrackMesh, *m_Shader, l_Transform);
+        glm::vec4 l_TrackColour(1.0f);
+
+        DrawMesh(*m_TrackMesh, *m_Shader, l_Transform, l_TrackColour);
     }
 #endif
 }

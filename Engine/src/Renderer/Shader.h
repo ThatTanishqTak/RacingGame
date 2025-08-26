@@ -18,8 +18,12 @@ namespace Engine
         void Bind() const;
         void Unbind() const;
 
+        void SetUniformMat2(const std::string& name, const glm::mat2& matrix) const;
+        void SetUniformMat3(const std::string& name, const glm::mat3& matrix) const;
         void SetUniformMat4(const std::string& name, const glm::mat4& matrix) const;
+        void SetUniformVec2(const std::string& name, const glm::vec2& matrix) const;
         void SetUniformVec3(const std::string& name, const glm::vec3& vector) const;
+        void SetUniformVec4(const std::string& name, const glm::vec4& vector) const;
         void SetUniformFloat(const std::string& name, float value) const;
 
     private:

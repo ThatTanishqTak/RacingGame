@@ -80,9 +80,17 @@ namespace Engine
 
     void Shader::Unbind() const { glUseProgram(0); }
 
+    void Shader::SetUniformMat2(const std::string& name, const glm::mat2& matrix) const { glUniformMatrix2fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(matrix)); }
+    
+    void Shader::SetUniformMat3(const std::string& name, const glm::mat3& matrix) const { glUniformMatrix3fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(matrix)); }
+
     void Shader::SetUniformMat4(const std::string& name, const glm::mat4& matrix) const { glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(matrix)); }
 
+    void Shader::SetUniformVec2(const std::string& name, const glm::vec2& vector) const { glUniform2fv(GetUniformLocation(name), 1, glm::value_ptr(vector)); }
+
     void Shader::SetUniformVec3(const std::string& name, const glm::vec3& vector) const { glUniform3fv(GetUniformLocation(name), 1, glm::value_ptr(vector)); }
+
+    void Shader::SetUniformVec4(const std::string& name, const glm::vec4& vector) const { glUniform4fv(GetUniformLocation(name), 1, glm::value_ptr(vector)); }
 
     void Shader::SetUniformFloat(const std::string& name, float value) const { glUniform1f(GetUniformLocation(name), value); }
 
