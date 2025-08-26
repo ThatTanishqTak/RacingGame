@@ -33,6 +33,11 @@ struct Overtake
     std::string Overtaken;
 };
 
+struct ViewModeToggle
+{
+    bool TopDown;
+};
+
 struct RaceState
 {
     std::string Date;

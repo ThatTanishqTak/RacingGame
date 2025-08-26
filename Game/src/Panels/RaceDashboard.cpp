@@ -13,6 +13,7 @@ RaceDashboard::RaceDashboard()
     g_EventBus.Subscribe<PitIn>([this](const PitIn& e) { m_Toasts.push_back(e.DriverName + " entered pit"); });
     g_EventBus.Subscribe<PitOut>([this](const PitOut& e) { m_Toasts.push_back(e.DriverName + " exited pit"); });
     g_EventBus.Subscribe<DNF>([this](const DNF& e) { m_Toasts.push_back(e.DriverName + " DNF: " + e.Reason); });
+    g_EventBus.Subscribe<ViewModeToggle>([this](const ViewModeToggle& e) { m_TopDownView = e.TopDown; });
 }
 
 void RaceDashboard::Render(const RaceState& state)
@@ -291,6 +292,10 @@ void RaceDashboard::RenderSettingsPanel()
     if (ImGui::Begin("Settings"))
     {
         ImGui::Checkbox("Colour Blind Mode", &m_ColourBlindMode);
+        if (ImGui::Checkbox("Top Down View", &m_TopDownView))
+        {
+            g_EventBus.Publish(ViewModeToggle{ m_TopDownView });
+        }
         ImGui::SeparatorText("Track View");
         ImGui::SliderFloat("Zoom", &m_TrackZoom, 0.25f, 4.0f, "%.2f");
         ImGui::SliderFloat("Stroke Thickness", &m_TrackThickness, 0.05f, 0.60f, "%.2f");

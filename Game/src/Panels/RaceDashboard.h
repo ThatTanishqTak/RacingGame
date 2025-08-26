@@ -23,6 +23,7 @@ private:
 private:
     std::vector<std::string> m_Toasts;
     bool m_ColourBlindMode = false;
+    bool m_TopDownView = false;
     bool  m_ShowCars = true;
     bool  m_LabelCars = true;
     float m_TrackZoom = 0.8f;
