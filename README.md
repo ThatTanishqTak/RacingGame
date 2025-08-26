@@ -25,7 +25,6 @@ This README documents the current codebase, how to build and run it, and how to 
 - [Management Mode](#management-mode)
 - [Extending the Project](#extending-the-project)
 - [Known Issues \& TODO](#known-issues--todo)
-- [License](#license)
 - [Credits](#credits)
 
 ---
@@ -108,7 +107,7 @@ RacingGame/
 │     │  └─ TimingTowerPanel.{h,cpp}
 │     ├─ GameLayer.{h,cpp}
 │     └─ Game.cpp
-└─ LICENSE (placeholder)
+└─ LICENSE
 ```
 
 > **Output:** Binaries are written to `bin/{OS}-{Build}-{Arch}/RacingGame/` (e.g., `bin/Windows-Debug-x64/RacingGame/`). Game assets are copied to the same runtime folder post-build.
@@ -139,7 +138,7 @@ cmake --build build
 
 ### Run
 ```text
-bin/Windows-Debug-x64/RacingGame/Game.exe
+bin/{OS}-{Build}-{Arch}/RacingGame/Game.exe
 ```
 Assets are copied automatically via a post-build step in `Game/CMakeLists.txt`.
 
@@ -270,11 +269,6 @@ There are two places where `MANAGEMENT_MODE` can be defined:
 - `CameraController` is present but not integrated into the main loop.
 - Track rendering (3D) is a flat quad placeholder.
 - Input system currently defers to ImGui capture flags; no dedicated bindings yet.
-
----
-
-## License
-Placeholder. Choose a license (e.g., MIT) before open-sourcing.
 
 ---
 

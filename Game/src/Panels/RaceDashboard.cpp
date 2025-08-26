@@ -249,7 +249,7 @@ void RaceDashboard::RenderDriverPanels(const RaceState& state)
         for (const auto& it_driver : state.Drivers) 
         {
             ImVec4 l_Colour = g_PaletteManager.GetTeamColour(it_driver.TeamID, m_ColourBlindMode);
-            ImGui::TextColored(l_Colour, "Driver %it_Driver: %s", it_driver.Number, it_driver.Name.c_str());
+            ImGui::TextColored(l_Colour, "Driver %d: %s", it_driver.Number, it_driver.Name.c_str());
         }
     }
     ImGui::End();
@@ -268,7 +268,7 @@ void RaceDashboard::RenderScoreboardPanel(const RaceState& state)
             {
                 l_Colour = g_PaletteManager.GetTeamColour(it->TeamID, m_ColourBlindMode);
             }
-            ImGui::TextColored(l_Colour, "%it_Driver: %it_Driver", l_Position++, it_Position);
+            ImGui::TextColored(l_Colour, "%d: %d", l_Position++, it_Position);
         }
     }
     ImGui::End();
