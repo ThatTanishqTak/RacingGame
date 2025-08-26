@@ -23,6 +23,7 @@ namespace Engine
         const glm::mat4& GetTransform() const;
 
         unsigned int GetIndexCount() const { return static_cast<unsigned int>(m_Indices.size()); }
+        const std::vector<float>& GetVertices() const { return m_Vertices; }
 
     private:
         void SetupMesh();

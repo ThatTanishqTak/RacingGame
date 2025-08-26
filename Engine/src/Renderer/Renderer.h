@@ -21,8 +21,11 @@ namespace Engine
         void DrawMesh(const Mesh& mesh, const Shader& shader, const glm::mat4& transform, const glm::vec4& colour);
 
         enum class ViewMode { View3D, View2DTopDown };
+
         void SetViewMode(ViewMode mode);
         ViewMode GetViewMode() const { return m_ViewMode; }
+        const glm::vec2& GetTrackMin() const { return m_TrackMin; }
+        const glm::vec2& GetTrackMax() const { return m_TrackMax; }
 
 #ifndef MANAGEMENT_MODE
         void DrawTrack();
@@ -42,4 +45,6 @@ namespace Engine
         glm::vec2 m_TrackMax{};
         ViewMode m_ViewMode{ ViewMode::View3D };
     };
+
+    extern Renderer* g_Renderer;
 }

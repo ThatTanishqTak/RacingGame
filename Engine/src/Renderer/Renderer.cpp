@@ -12,9 +12,12 @@
 
 #include <fstream>
 #include <sstream>
+#include <limits>
 
 namespace Engine
 {
+    Renderer* g_Renderer = nullptr;
+
     namespace
     {
         std::string ReadFile(const std::string& path)
@@ -54,10 +57,12 @@ namespace Engine
 
         m_TrackMin = { std::numeric_limits<float>::max(), std::numeric_limits<float>::max() };
         m_TrackMax = { std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest() };
-        for (size_t i = 0; i < l_TrackVertices.size(); i += 3)
+        
+        const auto& l_Vertices = m_TrackMesh->GetVertices();
+        for (size_t i = 0; i < l_Vertices.size(); i += 3)
         {
-            float x = l_TrackVertices[i];
-            float z = l_TrackVertices[i + 2];
+            float x = l_Vertices[i];
+            float z = l_Vertices[i + 2];
 
             m_TrackMin.x = std::min(m_TrackMin.x, x);
             m_TrackMin.y = std::min(m_TrackMin.y, z);

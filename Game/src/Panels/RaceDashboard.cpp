@@ -1,5 +1,6 @@
 #include "RaceDashboard.h"
 #include "Core/PaletteManager.h"
+#include "Renderer/Renderer.h"
 #include "Renderer/StateStream.h"
 
 #include <GLFW/glfw3.h>
@@ -179,10 +180,18 @@ void RaceDashboard::RenderTrackViewPanel(const RaceState& state)
             // --- Car overlay (live) ---
             if (m_ShowCars)
             {
-                const float l_WorldMinimumX = -5.0f; 
-                const float l_WorldMaximumX = 5.0f;
-                const float l_WorldMinimumZ = -10.0f;
-                const float l_WorldMaximumZ = 10.0f;
+                glm::vec2 l_Min{ -5.0f, -10.0f };
+                glm::vec2 l_Max{ 5.0f, 10.0f };
+                if (Engine::g_Renderer)
+                {
+                    l_Min = Engine::g_Renderer->GetTrackMin();
+                    l_Max = Engine::g_Renderer->GetTrackMax();
+                }
+
+                const float l_WorldMinimumX = l_Min.x;
+                const float l_WorldMaximumX = l_Max.x;
+                const float l_WorldMinimumZ = l_Min.y;
+                const float l_WorldMaximumZ = l_Max.y;
 
                 auto a_WorldToScreen = [&](const glm::vec3& l_Position)
                     {
