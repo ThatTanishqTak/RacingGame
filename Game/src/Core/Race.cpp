@@ -1,6 +1,9 @@
 #include "Race.h"
-#include "Circuit.h"
-#include "Driver.h"
+
+#include "Core/Circuit.h"
+#include "Core/Driver.h"
+#include "Core/EventBus.h"
+#include "Core/RaceState.h"
 
 #include <algorithm>
 #include <random>
@@ -56,6 +59,23 @@ std::vector<SessionResult> Race::ConductQualifying(const std::vector<std::shared
 std::vector<SessionResult> Race::ConductRace(const std::vector<std::shared_ptr<Driver>>& drivers)
 {
     RaceResults = GenerateResults(drivers);
+
+    std::mt19937 rng{ std::random_device{}() };
+    std::uniform_real_distribution<double> dist(0.0, 1.0);
+
+    for (const auto& driver : drivers)
+    {
+        double chance = dist(rng);
+        if (chance < 0.1)
+        {
+            g_EventBus.Publish(PitIn{ driver->GetName() });
+            g_EventBus.Publish(PitOut{ driver->GetName() });
+        }
+        else if (chance < 0.15)
+        {
+            g_EventBus.Publish(DNF{ driver->GetName(), "mechanical failure" });
+        }
+    }
 
     return RaceResults;
 }

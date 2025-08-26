@@ -2,6 +2,13 @@
 
 #include <imgui.h>
 
+RaceDashboard::RaceDashboard()
+{
+    g_EventBus.Subscribe<PitIn>([this](const PitIn& e) { Toasts.push_back(e.DriverName + " entered pit"); });
+    g_EventBus.Subscribe<PitOut>([this](const PitOut& e) { Toasts.push_back(e.DriverName + " exited pit"); });
+    g_EventBus.Subscribe<DNF>([this](const DNF& e) { Toasts.push_back(e.DriverName + " DNF: " + e.Reason); });
+}
+
 void RaceDashboard::Render(const RaceState& state)
 {
     RenderPitCrewPanel(state);
@@ -9,6 +16,7 @@ void RaceDashboard::Render(const RaceState& state)
     RenderTrackViewPanel(state);
     RenderDriverPanels(state);
     RenderScoreboardPanel(state);
+    RenderToasts();
 }
 
 void RaceDashboard::RenderPitCrewPanel(const RaceState& state)
@@ -72,6 +80,20 @@ void RaceDashboard::RenderScoreboardPanel(const RaceState& state)
         for (int pos : state.Positions)
         {
             ImGui::Text("%d: %d", position++, pos);
+        }
+    }
+    ImGui::End();
+}
+
+void RaceDashboard::RenderToasts()
+{
+    ImGui::SetNextWindowPos(ImVec2(1000.0f, 600.0f), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(200.0f, 100.0f), ImGuiCond_FirstUseEver);
+    if (ImGui::Begin("HUD Toasts"))
+    {
+        for (const auto& msg : Toasts)
+        {
+            ImGui::Text("%s", msg.c_str());
         }
     }
     ImGui::End();

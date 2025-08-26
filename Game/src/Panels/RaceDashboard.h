@@ -1,10 +1,14 @@
 #pragma once
 
 #include "Core/RaceState.h"
+#include "Core/EventBus.h"
+#include <string>
+#include <vector>
 
 class RaceDashboard
 {
 public:
+    RaceDashboard();
     void Render(const RaceState& state);
 
 private:
@@ -13,4 +17,8 @@ private:
     void RenderTrackViewPanel(const RaceState& state);
     void RenderDriverPanels(const RaceState& state);
     void RenderScoreboardPanel(const RaceState& state);
+    void RenderToasts();
+
+private:
+    std::vector<std::string> Toasts;
 };
