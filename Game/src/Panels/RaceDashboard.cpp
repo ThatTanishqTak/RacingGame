@@ -50,83 +50,192 @@ void RaceDashboard::RenderRaceInfoPanel(const RaceState& state)
 
 void RaceDashboard::RenderTrackViewPanel(const RaceState& state)
 {
-    if (ImGui::Begin("Track View"))
+    if (ImGui::Begin("Live"))
     {
-        ImVec2 l_CanvasSize = ImGui::GetContentRegionAvail();
-        if (l_CanvasSize.x < 50.0f)
-        {
-            l_CanvasSize.x = 50.0f;
-        }
+        ImVec2 l_Canvas = ImGui::GetContentRegionAvail();
+        l_Canvas.x = std::max(50.0f, l_Canvas.x);
+        l_Canvas.y = std::max(50.0f, l_Canvas.y);
 
-        if (l_CanvasSize.y < 50.0f)
-        {
-            l_CanvasSize.y = 50.0f;
-        }
-
-        ImVec2 l_CanvasPosition = ImGui::GetCursorScreenPos();
+        ImVec2 l_Origin = ImGui::GetCursorScreenPos();
         ImDrawList* l_DrawList = ImGui::GetWindowDrawList();
-        l_DrawList->AddRectFilled(l_CanvasPosition, ImVec2(l_CanvasPosition.x + l_CanvasSize.x, l_CanvasPosition.y + l_CanvasSize.y), IM_COL32(30, 30, 30, 255));
-        l_DrawList->AddRect(l_CanvasPosition, ImVec2(l_CanvasPosition.x + l_CanvasSize.x, l_CanvasPosition.y + l_CanvasSize.y), IM_COL32(255, 255, 255, 255));
 
+        // Background + border
+        l_DrawList->AddRectFilled(l_Origin, ImVec2(l_Origin.x + l_Canvas.x, l_Origin.y + l_Canvas.y), IM_COL32(30, 30, 30, 255));
+        l_DrawList->AddRect(l_Origin, ImVec2(l_Origin.x + l_Canvas.x, l_Origin.y + l_Canvas.y), IM_COL32(255, 255, 255, 255));
+
+        // Nothing to l_Drawable?
         if (!state.TrackLayout.empty())
         {
-            float l_LayoutWidth = static_cast<float>(state.TrackLayout[0].size());
-            float l_LayoutHeight = static_cast<float>(state.TrackLayout.size());
-            float l_TileWidth = (l_CanvasSize.x / l_LayoutWidth) * m_TrackZoom;
-            float l_TileHeight = (l_CanvasSize.y / l_LayoutHeight) * m_TrackZoom;
-            ImVec2 l_TrackSize = ImVec2(l_TileWidth * l_LayoutWidth, l_TileHeight * l_LayoutHeight);
-            ImVec2 l_Origin = ImVec2(l_CanvasPosition.x + (l_CanvasSize.x - l_TrackSize.x) * 0.5f, l_CanvasPosition.y + (l_CanvasSize.y - l_TrackSize.y) * 0.5f);
+            const float l_LayoutWidth = static_cast<float>(state.TrackLayout[0].size());
+            const float l_LayoutHeight = static_cast<float>(state.TrackLayout.size());
 
-            for (size_t y = 0; y < state.TrackLayout.size(); ++y)
+            // Scale the track to the l_Canvas with zoom
+            const float l_TileWidth = (l_Canvas.x / l_LayoutWidth) * m_TrackZoom;
+            const float l_TileHeight = (l_Canvas.y / l_LayoutHeight) * m_TrackZoom;
+
+            ImVec2 l_TrackSize{ l_TileWidth * l_LayoutWidth, l_TileHeight * l_LayoutHeight };
+            ImVec2 l_TrackMinimum{ l_Origin.x + (l_Canvas.x - l_TrackSize.x) * 0.5f, l_Origin.y + (l_Canvas.y - l_TrackSize.y) * 0.5f };
+            ImVec2 l_TrackMaximum{ l_TrackMinimum.x + l_TrackSize.x, l_TrackMinimum.y + l_TrackSize.y };
+
+            auto a_CellMininum = [&](int x, int y) { return ImVec2(l_TrackMinimum.x + x * l_TileWidth, l_TrackMinimum.y + y * l_TileHeight); };
+            auto a_CellMaximum = [&](int x, int y) { return ImVec2(l_TrackMinimum.x + (x + 1) * l_TileWidth, l_TrackMinimum.y + (y + 1) * l_TileHeight); };
+            auto a_CellCenter = [&](int x, int y) { ImVec2 l_Minimum = a_CellMininum(x, y), l_Maximum = a_CellMaximum(x, y); return ImVec2((l_Minimum.x + l_Maximum.x) * 0.5f, (l_Minimum.y + l_Maximum.y) * 0.5f); };
+
+            // Stroke thickness and padding in pixels (based on the *smaller* tile dimension)
+            const float l_Base = std::min(l_TileWidth, l_TileHeight);
+            const float l_Padding = l_Base * m_TrackPadding;
+            const float l_Thickness = std::max(1.0f, l_Base * m_TrackThickness);
+
+            // Draw each tile as l_Minimum *thin* line/rect instead of l_Minimum full block
+            for (int y = 0; y < (int)state.TrackLayout.size(); ++y)
             {
-                for (size_t x = 0; x < state.TrackLayout[y].size(); ++x)
+                const std::string& l_Row = state.TrackLayout[y];
+                for (int x = 0; x < (int)l_Row.size(); ++x)
                 {
-                    char l_Tile = state.TrackLayout[y][x];
-                    ImU32 l_Colour;
-                    bool l_Draw = true;
+                    const char l_Type = l_Row[x];
+                    ImU32 l_Column = 0;
+                    bool l_Drawable = true;
 
-                    switch (l_Tile)
+                    switch (l_Type)
                     {
-                    case '-':
-                    case '|':
-                    case '\\':
-                    case '/':
-                        l_Colour = IM_COL32(100, 100, 100, 255);
-                        break;
-                    case '*':
-                        l_Colour = IM_COL32(255, 255, 255, 255);
-                        break;
-                    case '&':
-                        l_Colour = IM_COL32(0, 0, 255, 255);
-                        break;
-                    case '[':
-                    case ']':
-                        l_Colour = IM_COL32(0, 255, 0, 255);
-                        break;
-                    default:
-                        l_Draw = false;
-                        break;
+                        case '-': l_Column = IM_COL32(130, 130, 130, 255); break;  // road (horizontal)
+                        case '|': l_Column = IM_COL32(130, 130, 130, 255); break;  // road (vertical)
+                        case '\\': l_Column = IM_COL32(130, 130, 130, 255); break; // road (diag)
+                        case '/':  l_Column = IM_COL32(130, 130, 130, 255); break; // road (diag)
+                        case '*':  l_Column = IM_COL32(255, 255, 255, 255); break; // S/F
+                        case '&':  l_Column = IM_COL32(0, 0, 255, 255); break; // pitlane
+                        
+                        case '[':
+                        case ']':  l_Column = IM_COL32(0, 255, 0, 255); break; // curbs/markers
+                        
+                        case ' ':  l_Drawable = false; break;
+                        default:   l_Drawable = false; break;
+                    }
+                    
+                    if (!l_Drawable)
+                    {
+                        continue;
                     }
 
-                    if (l_Draw)
-                    {
-                        ImVec2 l_Minimum = ImVec2(l_Origin.x + x * l_TileWidth, l_Origin.y + y * l_TileHeight);
-                        ImVec2 l_Maximum = ImVec2(l_Minimum.x + l_TileWidth, l_Minimum.y + l_TileHeight);
+                    ImVec2 l_Minimum = a_CellMininum(x, y);
+                    ImVec2 l_Maximum = a_CellMaximum(x, y);
+                    const float l_X = (l_Minimum.x + l_Maximum.x) * 0.5f;
+                    const float l_Y = (l_Minimum.y + l_Maximum.y) * 0.5f;
 
-                        l_DrawList->AddRectFilled(l_Minimum, l_Maximum, l_Colour);
+                    if (l_Type == '-')
+                    {
+                        // Horizontal stroke
+                        l_DrawList->AddRectFilled(ImVec2(l_Minimum.x + l_Padding, l_Y - l_Thickness * 0.5f), ImVec2(l_Maximum.x - l_Padding, l_Y + l_Thickness * 0.5f), l_Column);
+                    }
+
+                    else if (l_Type == '|')
+                    {
+                        // Vertical stroke
+                        l_DrawList->AddRectFilled(ImVec2(l_X - l_Thickness * 0.5f, l_Minimum.y + l_Padding), ImVec2(l_X + l_Thickness * 0.5f, l_Maximum.y - l_Padding), l_Column);
+                    }
+
+                    else if (l_Type == '\\')
+                    {
+                        // Diagonal bottom-left -> top-right
+                        l_DrawList->AddLine(ImVec2(l_Minimum.x + l_Padding, l_Maximum.y - l_Padding), ImVec2(l_Maximum.x - l_Padding, l_Minimum.y + l_Padding), l_Column, l_Thickness);
+                    }
+
+                    else if (l_Type == '/')
+                    {
+                        // Diagonal top-left -> bottom-right
+                        l_DrawList->AddLine(ImVec2(l_Minimum.x + l_Padding, l_Minimum.y + l_Padding), ImVec2(l_Maximum.x - l_Padding, l_Maximum.y - l_Padding), l_Column, l_Thickness);
+                    }
+
+                    else if (l_Type == '*')
+                    {
+                        // Thin S/F stripe
+                        l_DrawList->AddRectFilled(ImVec2(l_Minimum.x + l_Padding, l_Y - l_Thickness * 0.35f), ImVec2(l_Maximum.x - l_Padding, l_Y + l_Thickness * 0.35f), l_Column);
+                    }
+
+                    else if (l_Type == '[' || l_Type == ']')
+                    {
+                        // Small curb marker on cell edge
+                        const float curbW = std::max(1.0f, l_Thickness * 0.8f);
+                        if (l_Type == '[')
+                        {
+                            l_DrawList->AddRectFilled(ImVec2(l_Minimum.x + l_Padding, l_Minimum.y + l_Padding), ImVec2(l_Minimum.x + l_Padding + curbW, l_Maximum.y - l_Padding), l_Column);
+                        }
+
+                        else
+                        {
+                            l_DrawList->AddRectFilled(ImVec2(l_Maximum.x - l_Padding - curbW, l_Minimum.y + l_Padding), ImVec2(l_Maximum.x - l_Padding, l_Maximum.y - l_Padding), l_Column);
+                        }
+                    }
+
+                    else if (l_Type == '&')
+                    {
+                        // Pitlane "slot"
+                        l_DrawList->AddRect(ImVec2(l_Minimum.x + l_Padding, l_Minimum.y + l_Padding), ImVec2(l_Maximum.x - l_Padding, l_Maximum.y - l_Padding), l_Column, 0.0f, 0, l_Thickness * 0.5f);
+                    }
+                }
+            }
+
+            // --- Car overlay (live) ---
+            if (m_ShowCars)
+            {
+                const float l_WorldMinimumX = -5.0f; 
+                const float l_WorldMaximumX = 5.0f;
+                const float l_WorldMinimumZ = -10.0f;
+                const float l_WorldMaximumZ = 10.0f;
+
+                auto a_WorldToScreen = [&](const glm::vec3& l_Position)
+                    {
+                        const float nx = (l_Position.x - l_WorldMinimumX) / (l_WorldMaximumX - l_WorldMinimumX);
+                        const float ny = (l_Position.z - l_WorldMinimumZ) / (l_WorldMaximumZ - l_WorldMinimumZ);
+
+                        return ImVec2(l_TrackMinimum.x + nx * l_TrackSize.x, l_TrackMinimum.y + ny * l_TrackSize.y);
+                    };
+
+                // Map it_Car ID -> team colour using RaceState (ID 0->Number 1, etc.)
+                auto a_IDToColour = [&](int carId)
+                    {
+                        int l_NumberGuess = carId + 1;
+                        int l_TeamID = 0;
+                        for (const auto& it_Driver : state.Drivers)
+                        {
+                            if (it_Driver.Number == l_NumberGuess)
+                            { 
+                                l_TeamID = it_Driver.TeamID; 
+                                break; 
+                            }
+                        }
+                        ImVec4 l_Color = g_PaletteManager.GetTeamColour((size_t)l_TeamID, m_ColourBlindMode);
+                        
+                        return IM_COL32((int)(l_Color.x * 255), (int)(l_Color.y * 255), (int)(l_Color.z * 255), 255);
+                    };
+
+                // Live positions
+                double l_Time = glfwGetTime();
+                auto a_Cars = Engine::g_StateBuffer.Interpolate(l_Time);
+
+                for (const auto& it_Car : a_Cars)
+                {
+                    ImU32 l_Column = a_IDToColour(it_Car.ID);
+                    ImVec2 l_Position = a_WorldToScreen(it_Car.Position);
+                    l_DrawList->AddCircleFilled(l_Position, m_CarRadiusPx, l_Column);
+
+                    if (m_LabelCars)
+                    {
+                        char l_Buffer[8];
+                        snprintf(l_Buffer, sizeof(l_Buffer), "%it_Driver", it_Car.ID + 1);
+                        l_DrawList->AddText(ImVec2(l_Position.x + m_CarRadiusPx + 2.0f, l_Position.y - 7.0f), IM_COL32(255, 255, 255, 220), l_Buffer);
                     }
                 }
             }
         }
 
-        ImGui::InvisibleButton("canvas", l_CanvasSize);
+        ImGui::InvisibleButton("##track_l_Canvas", l_Canvas, ImGuiButtonFlags_MouseButtonLeft);
         if (ImGui::IsItemHovered())
         {
-            float l_Wheel = ImGui::GetIO().MouseWheel;
-            if (l_Wheel != 0.0f)
+            const float l_Zoom = ImGui::GetIO().MouseWheel;
+            if (l_Zoom != 0.0f)
             {
-                m_TrackZoom += l_Wheel * 0.1f;
-                m_TrackZoom = std::clamp(m_TrackZoom, 0.5f, 3.0f);
+                m_TrackZoom = std::clamp(m_TrackZoom + l_Zoom * 0.1f, 0.25f, 4.0f);
             }
         }
     }
@@ -140,7 +249,7 @@ void RaceDashboard::RenderDriverPanels(const RaceState& state)
         for (const auto& it_driver : state.Drivers) 
         {
             ImVec4 l_Colour = g_PaletteManager.GetTeamColour(it_driver.TeamID, m_ColourBlindMode);
-            ImGui::TextColored(l_Colour, "Driver %d: %s", it_driver.Number, it_driver.Name.c_str());
+            ImGui::TextColored(l_Colour, "Driver %it_Driver: %s", it_driver.Number, it_driver.Name.c_str());
         }
     }
     ImGui::End();
@@ -153,13 +262,13 @@ void RaceDashboard::RenderScoreboardPanel(const RaceState& state)
         int l_Position = 1;
         for (int it_Position : state.Positions) 
         {
-            auto it = std::find_if(state.Drivers.begin(), state.Drivers.end(), [it_Position](const DriverInfo& d) { return d.Number == it_Position; });
+            auto it = std::find_if(state.Drivers.begin(), state.Drivers.end(), [it_Position](const DriverInfo& it_Driver) { return it_Driver.Number == it_Position; });
             ImVec4 l_Colour = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
             if (it != state.Drivers.end()) 
             {
                 l_Colour = g_PaletteManager.GetTeamColour(it->TeamID, m_ColourBlindMode);
             }
-            ImGui::TextColored(l_Colour, "%d: %d", l_Position++, it_Position);
+            ImGui::TextColored(l_Colour, "%it_Driver: %it_Driver", l_Position++, it_Position);
         }
     }
     ImGui::End();
@@ -177,11 +286,20 @@ void RaceDashboard::RenderToasts()
     ImGui::End();
 }
 
-void RaceDashboard::RenderSettingsPanel() 
+void RaceDashboard::RenderSettingsPanel()
 {
-    if (ImGui::Begin("Settings")) 
+    if (ImGui::Begin("Settings"))
     {
         ImGui::Checkbox("Colour Blind Mode", &m_ColourBlindMode);
+        ImGui::SeparatorText("Track View");
+        ImGui::SliderFloat("Zoom", &m_TrackZoom, 0.25f, 4.0f, "%.2f");
+        ImGui::SliderFloat("Stroke Thickness", &m_TrackThickness, 0.05f, 0.60f, "%.2f");
+        ImGui::SliderFloat("Stroke Padding", &m_TrackPadding, 0.00f, 0.40f, "%.2f");
+
+        ImGui::SeparatorText("Cars");
+        ImGui::Checkbox("Show Cars", &m_ShowCars);
+        ImGui::Checkbox("Label Cars", &m_LabelCars);
+        ImGui::SliderFloat("Car Radius (px)", &m_CarRadiusPx, 3.0f, 16.0f, "%.0f");
     }
     ImGui::End();
 }

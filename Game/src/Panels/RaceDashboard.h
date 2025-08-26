@@ -23,5 +23,10 @@ private:
 private:
     std::vector<std::string> m_Toasts;
     bool m_ColourBlindMode = false;
-    float m_TrackZoom = 1.0f;
+    bool  m_ShowCars = true;
+    bool  m_LabelCars = true;
+    float m_TrackZoom = 0.8f;
+    float m_TrackThickness = 0.22f;
+    float m_TrackPadding = 0.12f;
+    float m_CarRadiusPx = 7.0f;
 };
