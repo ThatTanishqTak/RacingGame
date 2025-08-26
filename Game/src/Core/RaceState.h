@@ -19,6 +19,7 @@ struct RaceState
     std::vector<int> Positions;
     std::vector<float> Intervals;
     std::string FlagStatus;
+    std::vector<std::string> TrackLayout;
 };
 
 struct PitIn

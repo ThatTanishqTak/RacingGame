@@ -52,41 +52,68 @@ void RaceDashboard::RenderTrackViewPanel(const RaceState& state)
 {
     if (ImGui::Begin("Track View"))
     {
-        ImVec2 l_CanvasSize = ImGui::GetContentRegionAvail();
-        if (l_CanvasSize.x < 50.0f)
+        ImVec2 canvasSize = ImGui::GetContentRegionAvail();
+        if (canvasSize.x < 50.0f)
         {
-            l_CanvasSize.x = 50.0f;
-        }
-        
-        if (l_CanvasSize.y < 50.0f)
-        {
-            l_CanvasSize.y = 50.0f;
+            canvasSize.x = 50.0f;
         }
 
-        ImVec2 l_CanvasPos = ImGui::GetCursorScreenPos();
-        ImDrawList* l_DrawList = ImGui::GetWindowDrawList();
-        l_DrawList->AddRectFilled(l_CanvasPos, ImVec2(l_CanvasPos.x + l_CanvasSize.x, l_CanvasPos.y + l_CanvasSize.y), IM_COL32(30, 30, 30, 255));
-        l_DrawList->AddRect(l_CanvasPos, ImVec2(l_CanvasPos.x + l_CanvasSize.x, l_CanvasPos.y + l_CanvasSize.y), IM_COL32(255, 255, 255, 255));
+        if (canvasSize.y < 50.0f)
+        {
+            canvasSize.y = 50.0f;
+        }
 
-        auto l_ToScreen = [&](const glm::vec2& p)
+        ImVec2 canvasPos = ImGui::GetCursorScreenPos();
+        ImDrawList* drawList = ImGui::GetWindowDrawList();
+        drawList->AddRectFilled(canvasPos, ImVec2(canvasPos.x + canvasSize.x, canvasPos.y + canvasSize.y), IM_COL32(30, 30, 30, 255));
+        drawList->AddRect(canvasPos, ImVec2(canvasPos.x + canvasSize.x, canvasPos.y + canvasSize.y), IM_COL32(255, 255, 255, 255));
+
+        if (!state.TrackLayout.empty())
+        {
+            float tileWidth = canvasSize.x / static_cast<float>(state.TrackLayout[0].size());
+            float tileHeight = canvasSize.y / static_cast<float>(state.TrackLayout.size());
+
+            for (size_t y = 0; y < state.TrackLayout.size(); ++y)
             {
-                float l_U = (p.x + 5.0f) / 10.0f;
-                float l_V = (p.y + 10.0f) / 20.0f;
-                
-                return ImVec2(l_CanvasPos.x + l_U * l_CanvasSize.x, l_CanvasPos.y + (1.0f - l_V) * l_CanvasSize.y);
-            };
+                for (size_t x = 0; x < state.TrackLayout[y].size(); ++x)
+                {
+                    char tile = state.TrackLayout[y][x];
+                    ImU32 colour;
+                    bool draw = true;
+                    switch (tile)
+                    {
+                    case '-':
+                    case '|':
+                    case '\\':
+                    case '/':
+                        colour = IM_COL32(100, 100, 100, 255);
+                        break;
+                    case '*':
+                        colour = IM_COL32(255, 255, 255, 255);
+                        break;
+                    case '&':
+                        colour = IM_COL32(0, 0, 255, 255);
+                        break;
+                    case '[':
+                    case ']':
+                        colour = IM_COL32(0, 255, 0, 255);
+                        break;
+                    default:
+                        draw = false;
+                        break;
+                    }
 
-        l_DrawList->AddRect(l_ToScreen({ -5.0f, -10.0f }), l_ToScreen({ 5.0f, 10.0f }), IM_COL32(200, 200, 200, 255));
-
-        double l_Time = glfwGetTime();
-        auto l_States = Engine::GlobalStateBuffer.Interpolate(l_Time);
-        for (const auto& l_Car : l_States)
-        {
-            ImVec2 l_Pos = l_ToScreen({ l_Car.Position.x, l_Car.Position.z });
-            l_DrawList->AddCircleFilled(l_Pos, 5.0f, IM_COL32(255, 0, 0, 255));
+                    if (draw)
+                    {
+                        ImVec2 min = ImVec2(canvasPos.x + x * tileWidth, canvasPos.y + y * tileHeight);
+                        ImVec2 max = ImVec2(min.x + tileWidth, min.y + tileHeight);
+                        drawList->AddRectFilled(min, max, colour);
+                    }
+                }
+            }
         }
 
-        ImGui::InvisibleButton("canvas", l_CanvasSize);
+        ImGui::InvisibleButton("canvas", canvasSize);
     }
     ImGui::End();
 }
