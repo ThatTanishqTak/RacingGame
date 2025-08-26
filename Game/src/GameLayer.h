@@ -3,5 +3,6 @@
 class GameLayer
 {
 public:
+    void Update();
     void Render();
 };

@@ -4,6 +4,11 @@
 #include "Panels/FlagPanel.h"
 #include "Core/RaceState.h"
 
+void GameLayer::Update()
+{
+
+}
+
 void GameLayer::Render()
 {
     static RaceDashboard Dashboard;
@@ -11,7 +16,7 @@ void GameLayer::Render()
     static FlagPanel Flags;
 
     RaceState State;
-    State.Date = "2023-01-01";
+    State.Date = "18-10-2025";
     State.Time = "12:00";
     State.Weather = "Clear";
     State.Drivers.push_back({ "Alice", 1, 0 });

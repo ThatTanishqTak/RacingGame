@@ -1,16 +1,18 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <memory>
 
 namespace Engine
 {
     class Mesh;
     class Shader;
+    class Camera;
 
     class Renderer
     {
     public:
-        bool Initialize();
+        bool Initialize(Camera* camera);
         void Shutdown();
 
         void BeginFrame();
@@ -21,5 +23,11 @@ namespace Engine
 #ifndef MANAGEMENT_MODE
         void DrawTrack();
 #endif
+
+    private:
+        Camera* m_Camera{};
+        std::shared_ptr<Shader> m_Shader;
+        std::shared_ptr<Mesh> m_CarMesh;
+        std::shared_ptr<Mesh> m_TrackMesh;
     };
 }

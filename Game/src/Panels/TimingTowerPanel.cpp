@@ -8,7 +8,7 @@ void TimingTowerPanel::Render(const RaceState& state)
     if (ImGui::Begin("Timing Tower"))
     {
         ImFont* font = ImGui::GetFont();
-        float scale = /*font && font->FontSize < 12.0f ? 12.0f / font->FontSize :*/ 1.0f;
+        float scale = /*font && font->SetWindowFontScale() < 12.0f ? 12.0f / font->FontSize :*/ 1.0f;
         ImGui::SetWindowFontScale(scale);
 
         int position = 1;

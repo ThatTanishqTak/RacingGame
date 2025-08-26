@@ -1,6 +1,9 @@
 #include "GameLayer.h"
 #include "Core/EntryPoint.h"
 #include "Core/PaletteManager.h"
+#include "Renderer/StateStream.h"
+
+#include <GLFW/glfw3.h>
 
 class Game : public Engine::Application
 {
@@ -13,12 +16,17 @@ public:
 
     void Run() override
     {
+        double l_Start = glfwGetTime();
+        Engine::GlobalStateBuffer.SubmitSnapshot({ l_Start, { { 0, { 0.0f, 0.0f, 0.0f } }, { 1, { 2.0f, 0.0f, 0.0f } } } });
+        Engine::GlobalStateBuffer.SubmitSnapshot({ l_Start + 5.0, { { 0, { 0.0f, 0.0f, -10.0f } }, { 1, { 2.0f, 0.0f, -10.0f } } } });
+
         GameLayer layer;
         while (!m_Window->WindowShouldClose())
         {
             m_ImGuiLayer->BeginFrame();
             m_Renderer->BeginFrame();
 
+            layer.Update();
             layer.Render();
 
 #ifndef MANAGEMENT_MODE
