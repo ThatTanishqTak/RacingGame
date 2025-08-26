@@ -2,6 +2,7 @@
 
 #include <glm/glm.hpp>
 #include <memory>
+#include <vector>
 
 namespace Engine
 {
@@ -26,6 +27,7 @@ namespace Engine
         ViewMode GetViewMode() const { return m_ViewMode; }
         const glm::vec2& GetTrackMin() const { return m_TrackMin; }
         const glm::vec2& GetTrackMax() const { return m_TrackMax; }
+        void SetTrackCenterline(const std::vector<glm::vec2>& centerline, float halfWidth);
 
 #ifndef MANAGEMENT_MODE
         void DrawTrack();
@@ -35,6 +37,7 @@ namespace Engine
     public:
         float m_CarMarkerRadius{ 5.0f };
         bool m_ShowCarLabels{ false };
+        bool m_ShowLaneLines{ false };
 
     private:
         Camera* m_Camera{};
@@ -43,6 +46,8 @@ namespace Engine
         std::shared_ptr<Mesh> m_TrackMesh;
         glm::vec2 m_TrackMin{};
         glm::vec2 m_TrackMax{};
+        std::vector<glm::vec2> m_TrackCenterline{};
+        float m_TrackHalfWidth{ 0.0f };
         ViewMode m_ViewMode{ ViewMode::View3D };
     };
 

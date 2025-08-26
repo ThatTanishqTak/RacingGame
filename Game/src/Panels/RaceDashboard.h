@@ -26,6 +26,7 @@ private:
     bool m_TopDownView = false;
     bool  m_ShowCars = true;
     bool  m_LabelCars = true;
+    bool  m_ShowLaneLines = false;
     float m_TrackZoom = 0.8f;
     float m_TrackThickness = 0.22f;
     float m_TrackPadding = 0.12f;

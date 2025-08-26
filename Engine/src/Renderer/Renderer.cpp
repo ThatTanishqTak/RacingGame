@@ -13,6 +13,7 @@
 #include <fstream>
 #include <sstream>
 #include <limits>
+#include <algorithm>
 
 namespace Engine
 {
@@ -120,6 +121,53 @@ namespace Engine
         glm::mat4 l_ViewProjection = m_Camera->GetProjectionMatrix() * m_Camera->GetViewMatrix();
         ImVec2 l_DisplaySize = ImGui::GetIO().DisplaySize;
 
+        if (m_ShowLaneLines && m_TrackCenterline.size() > 1)
+        {
+            std::vector<ImVec2> l_Left;
+            std::vector<ImVec2> l_Right;
+            l_Left.reserve(m_TrackCenterline.size());
+            l_Right.reserve(m_TrackCenterline.size());
+
+            for (size_t i = 0; i < m_TrackCenterline.size(); ++i)
+            {
+                glm::vec2 p = m_TrackCenterline[i];
+                glm::vec2 dir;
+                if (i + 1 < m_TrackCenterline.size())
+                {
+                    dir = glm::normalize(m_TrackCenterline[i + 1] - p);
+                }
+                else
+                {
+                    dir = glm::normalize(p - m_TrackCenterline[i - 1]);
+                }
+                glm::vec2 normal(-dir.y, dir.x);
+                glm::vec2 left = p + normal * m_TrackHalfWidth;
+                glm::vec2 right = p - normal * m_TrackHalfWidth;
+
+                auto toScreen = [&](const glm::vec2& pt) -> ImVec2
+                    {
+                        glm::vec4 clip = l_ViewProjection * glm::vec4(pt, 0.0f, 1.0f);
+                        if (clip.w == 0.0f)
+                        {
+                            return ImVec2(0.0f, 0.0f);
+                        }
+                        glm::vec3 ndc = glm::vec3(clip) / clip.w;
+                        return ImVec2((ndc.x * 0.5f + 0.5f) * l_DisplaySize.x,
+                            (1.0f - (ndc.y * 0.5f + 0.5f)) * l_DisplaySize.y);
+                    };
+
+                l_Left.push_back(toScreen(left));
+                l_Right.push_back(toScreen(right));
+            }
+
+            ImU32 l_Colour = IM_COL32(255, 255, 255, 80);
+            for (size_t i = 1; i < l_Left.size(); ++i)
+            {
+                l_DrawList->AddLine(l_Left[i - 1], l_Left[i], l_Colour);
+                l_DrawList->AddLine(l_Right[i - 1], l_Right[i], l_Colour);
+            }
+        }
+
         for (const auto& it_Car : a_States)
         {
             glm::vec4 l_Clip = l_ViewProjection * glm::vec4(it_Car.Position, 1.0f);
@@ -203,6 +251,23 @@ namespace Engine
         else
         {
             m_Camera->LookPerspective();
+        }
+    }
+
+    void Renderer::SetTrackCenterline(const std::vector<glm::vec2>& centerline, float halfWidth)
+    {
+        m_TrackCenterline = centerline;
+        m_TrackHalfWidth = halfWidth;
+
+        if (!m_TrackCenterline.empty())
+        {
+            m_TrackMin = m_TrackCenterline.front();
+            m_TrackMax = m_TrackCenterline.front();
+            for (const auto& p : m_TrackCenterline)
+            {
+                m_TrackMin = glm::min(m_TrackMin, p);
+                m_TrackMax = glm::max(m_TrackMax, p);
+            }
         }
     }
 }

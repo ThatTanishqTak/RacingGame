@@ -309,6 +309,10 @@ void RaceDashboard::RenderSettingsPanel()
         ImGui::SliderFloat("Zoom", &m_TrackZoom, 0.25f, 4.0f, "%.2f");
         ImGui::SliderFloat("Stroke Thickness", &m_TrackThickness, 0.05f, 0.60f, "%.2f");
         ImGui::SliderFloat("Stroke Padding", &m_TrackPadding, 0.00f, 0.40f, "%.2f");
+        if (ImGui::Checkbox("Lane Lines", &m_ShowLaneLines))
+        {
+            Engine::g_Renderer->m_ShowLaneLines = m_ShowLaneLines;
+        }
 
         ImGui::SeparatorText("Cars");
         ImGui::Checkbox("Show Cars", &m_ShowCars);

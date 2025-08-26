@@ -5,6 +5,7 @@
 #include "Panels/FlagPanel.h"
 #include "Core/RaceState.h"
 #include "Core/Circuit.h"
+#include "Renderer/Renderer.h"
 
 void GameLayer::Update()
 {
@@ -22,6 +23,7 @@ void GameLayer::Render()
     if (!l_LayoutLoaded)
     {
         l_Track.LoadLayout("Assets/Tracks/SampleTrack.txt");
+        Engine::g_Renderer->SetTrackCenterline(l_Track.GetCenterline(), l_Track.GetHalfWidth());
         l_LayoutLoaded = true;
     }
 
