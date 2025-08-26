@@ -10,7 +10,7 @@ class Game : public Engine::Application
 public:
     Game()
     {
-        g_PaletteManager.LoadPalettes("Game/Assets/Palettes/primary.json", "Game/Assets/Palettes/colourblind.json");
+        g_PaletteManager.LoadPalettes("Assets/Palettes/primary.json", "Assets/Palettes/colourblind.json");
     }
     ~Game() = default;
 

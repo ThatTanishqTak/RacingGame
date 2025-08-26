@@ -7,6 +7,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
+
 #include <fstream>
 #include <sstream>
 
@@ -19,6 +20,7 @@ namespace Engine
             std::ifstream l_File(path);
             std::stringstream l_Stream;
             l_Stream << l_File.rdbuf();
+
             return l_Stream.str();
         }
     }

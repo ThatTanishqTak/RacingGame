@@ -8,18 +8,21 @@ namespace Engine
 
     void StateBuffer::SubmitSnapshot(const Snapshot& snapshot)
     {
-        auto it = std::lower_bound(Snapshots.begin(), Snapshots.end(), snapshot.Time,
-            [](const Snapshot& s, double time) { return s.Time < time; });
+        auto it = std::lower_bound(Snapshots.begin(), Snapshots.end(), snapshot.Time, [](const Snapshot& s, double time) { return s.Time < time; });
         Snapshots.insert(it, snapshot);
     }
 
     std::vector<CarState> StateBuffer::Interpolate(double tRender) const
     {
         if (Snapshots.empty())
+        {
             return {};
+        }
 
         if (Snapshots.size() == 1)
+        {
             return Snapshots.front().Cars;
+        }
 
         if (tRender <= Snapshots.front().Time)
         {
@@ -35,6 +38,7 @@ namespace Engine
                     result[i].Position += (s1.Cars[i].Position - result[i].Position) * static_cast<float>(alpha);
                 }
             }
+
             return result;
         }
 
@@ -52,6 +56,7 @@ namespace Engine
                     result[i].Position += (s1.Cars[i].Position - s0.Cars[i].Position) * static_cast<float>(alpha);
                 }
             }
+
             return result;
         }
 
