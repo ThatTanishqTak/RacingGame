@@ -1,7 +1,9 @@
 #include "Renderer.h"
 #include "Mesh.h"
+#include "StateStream.h"
 
 #include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 namespace Engine
 {
@@ -23,6 +25,13 @@ namespace Engine
     {
         glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        double time = glfwGetTime();
+        auto states = GlobalStateBuffer.Interpolate(time);
+        for (const auto& car : states)
+        {
+            (void)car; // Placeholder for car rendering
+        }
     }
 
     void Renderer::EndFrame()

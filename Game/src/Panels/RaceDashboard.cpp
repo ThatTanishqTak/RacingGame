@@ -29,7 +29,9 @@ void RaceDashboard::RenderRaceInfoPanel(const RaceState& state)
     if (ImGui::Begin("Race Info"))
     {
         ImGui::Text("Date: %s", state.Date.c_str());
+        ImGui::SameLine();
         ImGui::Text("Time: %s", state.Time.c_str());
+        ImGui::SameLine();
         ImGui::Text("Weather: %s", state.Weather.c_str());
     }
     ImGui::End();
