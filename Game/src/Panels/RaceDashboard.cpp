@@ -222,14 +222,14 @@ void RaceDashboard::RenderTrackViewPanel(const RaceState& state)
                     if (m_LabelCars)
                     {
                         char l_Buffer[8];
-                        snprintf(l_Buffer, sizeof(l_Buffer), "%it_Driver", it_Car.ID + 1);
+                        snprintf(l_Buffer, sizeof(l_Buffer), "%d", it_Car.ID + 1);
                         l_DrawList->AddText(ImVec2(l_Position.x + m_CarRadiusPx + 2.0f, l_Position.y - 7.0f), IM_COL32(255, 255, 255, 220), l_Buffer);
                     }
                 }
             }
         }
 
-        ImGui::InvisibleButton("##track_l_Canvas", l_Canvas, ImGuiButtonFlags_MouseButtonLeft);
+        ImGui::InvisibleButton("##track_canvas", l_Canvas, ImGuiButtonFlags_MouseButtonLeft);
         if (ImGui::IsItemHovered())
         {
             const float l_Zoom = ImGui::GetIO().MouseWheel;

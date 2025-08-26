@@ -37,4 +37,17 @@ namespace Engine
         m_Renderer->Shutdown();
         m_Window->Shutdown();
     }
+
+    void Application::SetViewMode(Renderer::ViewMode mode)
+    {
+        if (m_Renderer)
+        {
+            m_Renderer->SetViewMode(mode);
+        }
+    }
+
+    Renderer::ViewMode Application::GetViewMode() const
+    {
+        return m_Renderer ? m_Renderer->GetViewMode() : Renderer::ViewMode::View3D;
+    }
 }

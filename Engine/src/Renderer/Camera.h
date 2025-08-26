@@ -10,6 +10,10 @@ namespace Engine
         bool Initialize(float fov, float aspectRatio, float nearClip, float farClip);
         void Shutdown();
 
+        void LookPerspective();
+        void LookTopDown(const glm::vec3& center, float height);
+        float GetAspectRatio() const { return m_AspectRatio; }
+
         const glm::vec3& GetPosition() const { return m_Position; }
         void SetPosition(const glm::vec3& position) { m_Position = position; }
 
@@ -30,5 +34,7 @@ namespace Engine
         float m_AspectRatio;
         float m_NearClip;
         float m_FarClip;
+        bool m_IsPerspective;
+        float m_OrthoHeight;
     };
 }

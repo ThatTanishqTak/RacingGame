@@ -15,6 +15,9 @@ namespace Engine
         Application();
         ~Application();
 
+        void SetViewMode(Renderer::ViewMode mode);
+        Renderer::ViewMode GetViewMode() const;
+
         virtual void Run()
         {
             while (!m_Window->WindowShouldClose())

@@ -55,6 +55,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/vendor/imgui>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/vendor/imgui/backends>
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/Game/src>
 )
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC

@@ -3,10 +3,12 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "StateStream.h"
+#include "Core/PaletteManager.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
+#include <imgui.h>
 
 #include <fstream>
 #include <sstream>
@@ -50,6 +52,19 @@ namespace Engine
         std::vector<uint32_t> l_TrackIndices = { 0, 1, 2, 2, 3, 0 };
         m_TrackMesh = std::make_shared<Mesh>(l_TrackVertices, l_TrackIndices);
 
+        m_TrackMin = { std::numeric_limits<float>::max(), std::numeric_limits<float>::max() };
+        m_TrackMax = { std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest() };
+        for (size_t i = 0; i < l_TrackVertices.size(); i += 3)
+        {
+            float x = l_TrackVertices[i];
+            float z = l_TrackVertices[i + 2];
+
+            m_TrackMin.x = std::min(m_TrackMin.x, x);
+            m_TrackMin.y = std::min(m_TrackMin.y, z);
+            m_TrackMax.x = std::max(m_TrackMax.x, x);
+            m_TrackMax.y = std::max(m_TrackMax.y, z);
+        }
+
         return true;
     }
 
@@ -67,20 +82,64 @@ namespace Engine
         DrawTrack();
 #endif
 
-        double l_Time = glfwGetTime();
-        auto a_States = g_StateBuffer.Interpolate(l_Time);
-        for (const auto& it_Car : a_States)
+        if (m_ViewMode == ViewMode::View3D)
         {
-            glm::mat4 l_Transform = glm::translate(glm::mat4(1.0f), it_Car.Position);
-            glm::vec4 l_CarColour(1.0f, 0.5f, 0.2f, 1.0f);
+            double l_Time = glfwGetTime();
+            auto a_States = g_StateBuffer.Interpolate(l_Time);
+            for (const auto& it_Car : a_States)
+            {
+                glm::mat4 l_Transform = glm::translate(glm::mat4(1.0f), it_Car.Position);
+                glm::vec4 l_CarColour(1.0f, 0.5f, 0.2f, 1.0f);
 
-            DrawMesh(*m_CarMesh, *m_Shader, l_Transform, l_CarColour);
+                DrawMesh(*m_CarMesh, *m_Shader, l_Transform, l_CarColour);
+            }
         }
     }
 
     void Renderer::EndFrame()
     {
 
+    }
+
+    void Renderer::View2DTopDown()
+    {
+#ifndef MANAGEMENT_MODE
+        DrawTrack();
+#endif
+
+        ImDrawList* l_DrawList = ImGui::GetForegroundDrawList();
+
+        double l_Time = glfwGetTime();
+        auto a_States = g_StateBuffer.Interpolate(l_Time);
+
+        glm::mat4 l_ViewProjection = m_Camera->GetProjectionMatrix() * m_Camera->GetViewMatrix();
+        ImVec2 l_DisplaySize = ImGui::GetIO().DisplaySize;
+
+        for (const auto& it_Car : a_States)
+        {
+            glm::vec4 l_Clip = l_ViewProjection * glm::vec4(it_Car.Position, 1.0f);
+            if (l_Clip.w == 0.0f)
+            {
+                continue;
+            }
+            glm::vec3 l_NDC = glm::vec3(l_Clip) / l_Clip.w;
+
+            ImVec2 l_Screen;
+            l_Screen.x = (l_NDC.x * 0.5f + 0.5f) * l_DisplaySize.x;
+            l_Screen.y = (1.0f - (l_NDC.y * 0.5f + 0.5f)) * l_DisplaySize.y;
+
+            ImVec4 l_Colour = g_PaletteManager.GetTeamColour(static_cast<size_t>(it_Car.ID), false);
+            ImU32 l_DrawColour = IM_COL32((int)(l_Colour.x * 255.0f), (int)(l_Colour.y * 255.0f), (int)(l_Colour.z * 255.0f), 255);
+
+            l_DrawList->AddCircleFilled(l_Screen, m_CarMarkerRadius, l_DrawColour);
+
+            if (m_ShowCarLabels)
+            {
+                char l_Buffer[8];
+                snprintf(l_Buffer, sizeof(l_Buffer), "%i", it_Car.ID + 1);
+                l_DrawList->AddText(ImVec2(l_Screen.x + m_CarMarkerRadius + 2.0f, l_Screen.y - 6.0f), IM_COL32(255, 255, 255, 255), l_Buffer);
+            }
+        }
     }
 
     void Renderer::DrawMesh(const Mesh& mesh, const Shader& shader, const glm::mat4& transform, const glm::vec4& colour)
@@ -91,7 +150,7 @@ namespace Engine
         }
 
         shader.Bind();
-        
+
         glm::mat4 l_MVP = m_Camera->GetProjectionMatrix() * m_Camera->GetViewMatrix() * transform;
         shader.SetUniformMat4("u_MVP", l_MVP);
         shader.SetUniformVec4("u_Color", colour);
@@ -113,4 +172,32 @@ namespace Engine
         DrawMesh(*m_TrackMesh, *m_Shader, l_Transform, l_TrackColour);
     }
 #endif
+
+    void Renderer::SetViewMode(ViewMode mode)
+    {
+        if (!m_Camera || m_ViewMode == mode)
+        {
+            m_ViewMode = mode;
+            return;
+        }
+
+        m_ViewMode = mode;
+
+        if (m_ViewMode == ViewMode::View2DTopDown)
+        {
+            glm::vec2 l_Size = m_TrackMax - m_TrackMin;
+            float l_Width = l_Size.x;
+            float l_Depth = l_Size.y;
+            float l_Aspect = m_Camera->GetAspectRatio();
+            float l_Height = std::max(l_Depth * 0.5f, (l_Width * 0.5f) / l_Aspect);
+
+            glm::vec3 l_Center((m_TrackMin.x + m_TrackMax.x) * 0.5f, 0.0f, (m_TrackMin.y + m_TrackMax.y) * 0.5f);
+            m_Camera->LookTopDown(l_Center, l_Height);
+        }
+
+        else
+        {
+            m_Camera->LookPerspective();
+        }
+    }
 }

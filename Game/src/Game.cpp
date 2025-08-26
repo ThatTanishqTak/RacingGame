@@ -21,8 +21,25 @@ public:
         Engine::g_StateBuffer.SubmitSnapshot({ l_Start + 5.0, { { 0, { 0.0f, 0.0f, -10.0f } }, { 1, { 2.0f, 0.0f, -10.0f } } } });
 
         GameLayer l_Layer;
+        bool l_LastV = false;
+
         while (!m_Window->WindowShouldClose())
         {
+            bool l_CurrentV = m_Window->IsKeyPressed(GLFW_KEY_V);
+            if (l_CurrentV && !l_LastV)
+            {
+                if (GetViewMode() == Engine::Renderer::ViewMode::View3D)
+                {
+                    SetViewMode(Engine::Renderer::ViewMode::View2DTopDown);
+                }
+
+                else
+                {
+                    SetViewMode(Engine::Renderer::ViewMode::View3D);
+                }
+            }
+            l_LastV = l_CurrentV;
+
             m_ImGuiLayer->BeginFrame();
             m_Renderer->BeginFrame();
 
