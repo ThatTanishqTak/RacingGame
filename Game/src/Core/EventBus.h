@@ -23,10 +23,14 @@ public:
     {
         auto it = Subscribers.find(typeid(Event));
         if (it == Subscribers.end())
+        {
             return;
+        }
 
         for (auto& handler : it->second)
+        {
             handler(&event);
+        }
     }
 
 private:

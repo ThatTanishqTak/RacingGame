@@ -24,8 +24,6 @@ void RaceDashboard::Render(const RaceState& state)
 
 void RaceDashboard::RenderPitCrewPanel(const RaceState& state)
 {
-    ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(200.0f, 600.0f), ImGuiCond_FirstUseEver);
     if (ImGui::Begin("Pit Crew"))
     {
         ImGui::Text("Pit Crew Panel");
@@ -35,8 +33,6 @@ void RaceDashboard::RenderPitCrewPanel(const RaceState& state)
 
 void RaceDashboard::RenderRaceInfoPanel(const RaceState& state)
 {
-    ImGui::SetNextWindowPos(ImVec2(200.0f, 0.0f), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(800.0f, 80.0f), ImGuiCond_FirstUseEver);
     if (ImGui::Begin("Race Info"))
     {
         ImGui::Text("Date: %s", state.Date.c_str());
@@ -50,8 +46,6 @@ void RaceDashboard::RenderRaceInfoPanel(const RaceState& state)
 
 void RaceDashboard::RenderTrackViewPanel(const RaceState& state)
 {
-    ImGui::SetNextWindowPos(ImVec2(200.0f, 80.0f), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(800.0f, 400.0f), ImGuiCond_FirstUseEver);
     if (ImGui::Begin("Track View"))
     {
         ImGui::Text("Track View Panel");
@@ -61,8 +55,6 @@ void RaceDashboard::RenderTrackViewPanel(const RaceState& state)
 
 void RaceDashboard::RenderDriverPanels(const RaceState& state)
 {
-    ImGui::SetNextWindowPos(ImVec2(200.0f, 480.0f), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(800.0f, 120.0f), ImGuiCond_FirstUseEver);
     if (ImGui::Begin("Drivers"))
     {
         for (const auto& driver : state.Drivers)
@@ -76,8 +68,6 @@ void RaceDashboard::RenderDriverPanels(const RaceState& state)
 
 void RaceDashboard::RenderScoreboardPanel(const RaceState& state)
 {
-    ImGui::SetNextWindowPos(ImVec2(1000.0f, 0.0f), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(200.0f, 600.0f), ImGuiCond_FirstUseEver);
     if (ImGui::Begin("Positions"))
     {
         int position = 1;
@@ -86,7 +76,9 @@ void RaceDashboard::RenderScoreboardPanel(const RaceState& state)
             auto it = std::find_if(state.Drivers.begin(), state.Drivers.end(), [pos](const DriverInfo& d) { return d.Number == pos; });
             ImVec4 colour = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
             if (it != state.Drivers.end())
+            {
                 colour = g_PaletteManager.GetTeamColour(it->TeamId, ColourBlindMode);
+            }
             ImGui::TextColored(colour, "%d: %d", position++, pos);
         }
     }
@@ -95,8 +87,6 @@ void RaceDashboard::RenderScoreboardPanel(const RaceState& state)
 
 void RaceDashboard::RenderToasts()
 {
-    ImGui::SetNextWindowPos(ImVec2(1000.0f, 600.0f), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(200.0f, 100.0f), ImGuiCond_FirstUseEver);
     if (ImGui::Begin("HUD Toasts"))
     {
         for (const auto& msg : Toasts)
@@ -109,8 +99,6 @@ void RaceDashboard::RenderToasts()
 
 void RaceDashboard::RenderSettingsPanel()
 {
-    ImGui::SetNextWindowPos(ImVec2(0.0f, 600.0f), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(200.0f, 100.0f), ImGuiCond_FirstUseEver);
     if (ImGui::Begin("Settings"))
     {
         ImGui::Checkbox("Colour Blind Mode", &ColourBlindMode);

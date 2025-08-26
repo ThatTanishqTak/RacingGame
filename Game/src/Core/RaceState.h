@@ -17,6 +17,8 @@ struct RaceState
     std::string Weather;
     std::vector<DriverInfo> Drivers;
     std::vector<int> Positions;
+    std::vector<float> Intervals;
+    std::string FlagStatus;
 };
 
 struct PitIn
