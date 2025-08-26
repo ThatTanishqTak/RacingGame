@@ -1,10 +1,14 @@
 #include "GameLayer.h"
 #include "Core/EntryPoint.h"
+#include "Core/PaletteManager.h"
 
 class Game : public Engine::Application
 {
 public:
-    Game() = default;
+    Game()
+    {
+        g_PaletteManager.LoadPalettes("Game/Assets/Palettes/primary.json", "Game/Assets/Palettes/colourblind.json");
+    }
     ~Game() = default;
 
     void Run() override

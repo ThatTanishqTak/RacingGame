@@ -41,7 +41,7 @@ namespace Engine
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
-		ImGui::DockSpaceOverViewport((ImGuiID)ImGui::GetMainViewport());
+		ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
 	}
 
 	void ImGuiLayer::EndFrame()

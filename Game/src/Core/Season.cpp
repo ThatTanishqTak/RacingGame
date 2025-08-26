@@ -29,7 +29,7 @@ std::map<std::shared_ptr<Driver>, int> Season::GetLeaderboard() const
                 points = PointsTable[i];
             }
 
-            auto& driverPoints = leaderboard[results[i].Driver];
+            auto& driverPoints = leaderboard[results[i].DriverRef];
             driverPoints += points;
         }
     }

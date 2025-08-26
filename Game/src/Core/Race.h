@@ -9,7 +9,7 @@ class Circuit;
 
 struct SessionResult
 {
-    std::shared_ptr<Driver> Driver;
+    std::shared_ptr<Driver> DriverRef;
     double Time;
 };
 

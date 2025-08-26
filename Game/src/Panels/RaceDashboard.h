@@ -18,7 +18,9 @@ private:
     void RenderDriverPanels(const RaceState& state);
     void RenderScoreboardPanel(const RaceState& state);
     void RenderToasts();
+    void RenderSettingsPanel();
 
 private:
     std::vector<std::string> Toasts;
+    bool ColourBlindMode = false;
 };

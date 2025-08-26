@@ -7,6 +7,7 @@ struct DriverInfo
 {
     std::string Name;
     int Number;
+    int TeamId;
 };
 
 struct RaceState
@@ -14,7 +15,7 @@ struct RaceState
     std::string Date;
     std::string Time;
     std::string Weather;
-    std::vector<DriverInfo> DriverInfo;
+    std::vector<DriverInfo> Drivers;
     std::vector<int> Positions;
 };
 

@@ -1,5 +1,7 @@
 #include "RaceDashboard.h"
+#include "Core/PaletteManager.h"
 
+#include <algorithm>
 #include <imgui.h>
 
 RaceDashboard::RaceDashboard()
@@ -17,6 +19,7 @@ void RaceDashboard::Render(const RaceState& state)
     RenderDriverPanels(state);
     RenderScoreboardPanel(state);
     RenderToasts();
+    RenderSettingsPanel();
 }
 
 void RaceDashboard::RenderPitCrewPanel(const RaceState& state)
@@ -62,9 +65,10 @@ void RaceDashboard::RenderDriverPanels(const RaceState& state)
     ImGui::SetNextWindowSize(ImVec2(800.0f, 120.0f), ImGuiCond_FirstUseEver);
     if (ImGui::Begin("Drivers"))
     {
-        for (const auto& driver : state.DriverInfo)
+        for (const auto& driver : state.Drivers)
         {
-            ImGui::Text("Driver %d: %s", driver.Number, driver.Name.c_str());
+            ImVec4 colour = g_PaletteManager.GetTeamColour(driver.TeamId, ColourBlindMode);
+            ImGui::TextColored(colour, "Driver %d: %s", driver.Number, driver.Name.c_str());
         }
     }
     ImGui::End();
@@ -79,7 +83,11 @@ void RaceDashboard::RenderScoreboardPanel(const RaceState& state)
         int position = 1;
         for (int pos : state.Positions)
         {
-            ImGui::Text("%d: %d", position++, pos);
+            auto it = std::find_if(state.Drivers.begin(), state.Drivers.end(), [pos](const DriverInfo& d) { return d.Number == pos; });
+            ImVec4 colour = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+            if (it != state.Drivers.end())
+                colour = g_PaletteManager.GetTeamColour(it->TeamId, ColourBlindMode);
+            ImGui::TextColored(colour, "%d: %d", position++, pos);
         }
     }
     ImGui::End();
@@ -95,6 +103,17 @@ void RaceDashboard::RenderToasts()
         {
             ImGui::Text("%s", msg.c_str());
         }
+    }
+    ImGui::End();
+}
+
+void RaceDashboard::RenderSettingsPanel()
+{
+    ImGui::SetNextWindowPos(ImVec2(0.0f, 600.0f), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(200.0f, 100.0f), ImGuiCond_FirstUseEver);
+    if (ImGui::Begin("Settings"))
+    {
+        ImGui::Checkbox("Colour Blind Mode", &ColourBlindMode);
     }
     ImGui::End();
 }
