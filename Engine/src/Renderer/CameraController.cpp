@@ -68,7 +68,37 @@ namespace Engine
 
     void CameraController::SetPanTarget(const glm::vec2& target)
     {
-        m_TargetPan = target;
+        if (m_Camera)
+        {
+            glm::mat4 l_Projection = m_Camera->GetProjectionMatrix();
+            glm::vec3 l_Position = m_Camera->GetPosition();
+
+            float l_HalfWidth = 0.0f;
+            float l_HalfHeight = 0.0f;
+
+            bool l_IsPerspective = glm::abs(l_Projection[3][3]) < 0.5f;
+            if (l_IsPerspective)
+            {
+                float l_Fov = 2.0f * glm::atan(1.0f / l_Projection[1][1]);
+                float l_Aspect = l_Projection[1][1] / l_Projection[0][0];
+                l_HalfHeight = glm::tan(l_Fov * 0.5f) * l_Position.y;
+                l_HalfWidth = l_HalfHeight * l_Aspect;
+            }
+
+            else
+            {
+                l_HalfWidth = 1.0f / l_Projection[0][0];
+                l_HalfHeight = 1.0f / l_Projection[1][1];
+            }
+
+            m_TargetPan.x = glm::clamp(target.x, m_TrackMin.x + l_HalfWidth, m_TrackMax.x - l_HalfWidth);
+            m_TargetPan.y = glm::clamp(target.y, m_TrackMin.y + l_HalfHeight, m_TrackMax.y - l_HalfHeight);
+        }
+
+        else
+        {
+            m_TargetPan = target;
+        }
     }
 
     void CameraController::SetZoomTarget(float target)
@@ -80,6 +110,8 @@ namespace Engine
     {
         m_TrackMin = minBounds;
         m_TrackMax = maxBounds;
+
+        ClampToTrack();
     }
 
     void CameraController::SetCarPositionProvider(const std::function<glm::vec2(int)>& provider)
