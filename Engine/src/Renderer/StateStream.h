@@ -9,6 +9,8 @@ namespace Engine
     {
         int ID;
         glm::vec3 Position;
+        float Yaw;
+        float Speed;
     };
 
     struct Snapshot

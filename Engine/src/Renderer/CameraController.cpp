@@ -17,7 +17,10 @@ namespace Engine
 
     void CameraController::Update(float deltaTime)
     {
-        if (!m_Camera) return;
+        if (!m_Camera)
+        {
+            return;
+        }
 
         if (m_Mode == Mode::FollowSelected && m_CarPositionProvider && m_SelectedCarId >= 0)
         {

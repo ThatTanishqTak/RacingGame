@@ -4,6 +4,7 @@
 #include "Renderer/StateStream.h"
 #include "Core/EventBus.h"
 #include "Core/RaceState.h"
+#include "Core/RaceSimulation.h"
 
 #include <GLFW/glfw3.h>
 #include <imgui.h>
@@ -26,12 +27,26 @@ public:
     void Run() override
     {
         double l_Start = glfwGetTime();
-        Engine::g_StateBuffer.SubmitSnapshot({ l_Start, { { 0, { 0.0f, 0.0f, 0.0f } }, { 1, { 2.0f, 0.0f, 0.0f } } } });
-        Engine::g_StateBuffer.SubmitSnapshot({ l_Start + 5.0, { { 0, { 0.0f, 0.0f, -10.0f } }, { 1, { 2.0f, 0.0f, -10.0f } } } });
+        RaceSimulation l_Sim(l_Start);
+        const double l_FixedTimeStep = 1.0 / 60.0;
+        double l_LastTime = l_Start;
+        double l_Accumulator = 0.0;
 
         GameLayer l_Layer;
         while (!m_Window->WindowShouldClose())
         {
+            double l_CurrentTime = glfwGetTime();
+            double l_FrameTime = l_CurrentTime - l_LastTime;
+            l_LastTime = l_CurrentTime;
+            l_Accumulator += l_FrameTime;
+
+            while (l_Accumulator >= l_FixedTimeStep)
+            {
+                l_Sim.Step(l_FixedTimeStep);
+                Engine::g_StateBuffer.SubmitSnapshot({ l_Sim.GetTime(), l_Sim.GetCars() });
+                l_Accumulator -= l_FixedTimeStep;
+            }
+
             bool l_TabDown = !ImGui::GetIO().WantCaptureKeyboard && m_Window->IsKeyPressed(GLFW_KEY_TAB);
             if (l_TabDown && !s_TogglePressed)
             {
