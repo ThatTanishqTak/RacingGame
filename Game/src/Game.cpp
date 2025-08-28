@@ -7,7 +7,7 @@
 #include "Core/PaletteManager.h"
 #include "Core/EventBus.h"
 #include "Core/RaceState.h"
-#include "Core/RaceSimimulation.h"
+#include "Core/RaceSimulation.h"
 #include "Core/Circuit.h"
 #include "Core/Track.h"
 
@@ -24,16 +24,16 @@ public:
     {
         g_PaletteManager.LoadPalettes("Assets/Palettes/primary.json", "Assets/Palettes/colourblind.json");
         g_EventBus.Subscribe<ViewModeToggle>([this](const ViewModeToggle& e)
-            {
-                SetViewMode(e.TopDown ? Engine::Renderer::ViewMode::View2DTopDown : Engine::Renderer::ViewMode::View3D);
-            });
+        {
+            SetViewMode(e.TopDown ? Engine::Renderer::ViewMode::View2DTopDown : Engine::Renderer::ViewMode::View3D);
+        });
     }
     ~Game() = default;
 
     void Run() override
     {
         double l_Start = glfwGetTime();
-        RaceSimimulation l_Sim(l_Start);
+        RaceSimulation l_Sim(l_Start);
         const double l_FixedTimeStep = 1.0 / 60.0;
         double l_LastTime = l_Start;
         double l_Accumulator = 0.0;

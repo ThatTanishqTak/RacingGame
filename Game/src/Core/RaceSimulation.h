@@ -1,12 +1,14 @@
 #pragma once
 
-#include <vector>
 #include "Renderer/StateStream.h"
+#include "Vehicle.h"
 
-class RaceSimimulation
+#include <vector>
+
+class RaceSimulation
 {
 public:
-    explicit RaceSimimulation(double startTime);
+    explicit RaceSimulation(double startTime);
 
     void Update(double deltaTime);
     double GetTime() const { return m_SimulationTime; }
@@ -14,5 +16,6 @@ public:
 
 private:
     double m_SimulationTime;
+    std::vector<Vehicle> m_Vehicles;
     std::vector<Engine::CarState> m_Cars;
 };
