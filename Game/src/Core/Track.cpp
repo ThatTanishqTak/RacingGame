@@ -23,6 +23,13 @@ void Track::SetWidthProfile(const std::vector<float>& widths)
     UpdateBounds();
 }
 
+void Track::SetPitLane(const std::vector<glm::vec2>& lane, float entry, float exit)
+{
+    PitLane = lane;
+    PitEntry = entry;
+    PitExit = exit;
+}
+
 void Track::BuildArcLengthTable()
 {
     ArcLengthTable.clear();
@@ -65,6 +72,21 @@ glm::vec2 Track::PositionAt(float positionAt) const
     float l_Temp = l_SegmentLength > 0.0f ? (positionAt - ArcLengthTable[l_Index - 1]) / l_SegmentLength : 0.0f;
 
     return glm::mix(RacingLine[l_Index - 1], RacingLine[l_Index], l_Temp);
+}
+
+bool Track::IsInPitLane(float progress) const
+{
+    if (PitLane.empty())
+    {
+        return false;
+    }
+
+    if (PitExit >= PitEntry)
+    {
+        return progress >= PitEntry && progress <= PitExit;
+    }
+
+    return progress >= PitEntry || progress <= PitExit;
 }
 
 void Track::ComputeRacingLine()

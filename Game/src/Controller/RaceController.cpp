@@ -15,7 +15,7 @@ RaceController::RaceController(float trackLength, int carCount, double startTime
     m_Classification.resize(carCount);
 }
 
-void RaceController::Update(double currentTime, const std::vector<float>& progress)
+void RaceController::Update(double currentTime, double deltaTime, const std::vector<float>& progress, const std::vector<bool>& inPitLane, const std::vector<float>& speeds)
 {
     if (m_State == State::PreRace)
     {
@@ -30,6 +30,35 @@ void RaceController::Update(double currentTime, const std::vector<float>& progre
     for (size_t i = 0; i < progress.size() && i < m_Timing.size(); ++i)
     {
         HandleProgress(static_cast<int>(i), progress[i], currentTime);
+
+        auto& a_Time = m_Timing[i];
+        bool l_InPit = (i < inPitLane.size()) ? inPitLane[i] : false;
+        if (l_InPit)
+        {
+            if (!a_Time.InPitLane)
+            {
+                a_Time.InPitLane = true;
+                a_Time.PitEntryTime = currentTime;
+                a_Time.ServiceTime = 0.0;
+            }
+
+            if (i < speeds.size() && speeds[i] < 0.1f)
+            {
+                a_Time.ServiceTime += deltaTime;
+            }
+        }
+
+        else if (a_Time.InPitLane)
+        {
+            a_Time.InPitLane = false;
+            double l_Total = currentTime - a_Time.PitEntryTime;
+            a_Time.PitExitDelta = l_Total - a_Time.ServiceTime;
+            a_Time.StopsDone++;
+            if (a_Time.StopsDone >= a_Time.MandatoryStops)
+            {
+                a_Time.PitStopCompleted = true;
+            }
+        }
     }
 
     m_Classification.clear();
@@ -49,6 +78,14 @@ void RaceController::Update(double currentTime, const std::vector<float>& progre
         });
 
     CheckBlueFlags();
+}
+
+void RaceController::SetPitStrategy(int carId, int mandatoryStops)
+{
+    if (carId >= 0 && carId < static_cast<int>(m_Timing.size()))
+    {
+        m_Timing[carId].MandatoryStops = std::max(0, mandatoryStops);
+    }
 }
 
 void RaceController::ChangeState(State newState)

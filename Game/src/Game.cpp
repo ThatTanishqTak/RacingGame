@@ -41,10 +41,17 @@ public:
 
         Track l_Track;
         l_Track.SetCenterline(l_Circuit.GetCenterline());
+        
         std::vector<float> l_Widths(l_Circuit.GetCenterline().size(), l_Circuit.GetHalfWidth() * 2.0f);
         l_Track.SetWidthProfile(l_Widths);
+        
+        std::vector<glm::vec2> l_PitLane = l_Circuit.GetCenterline();
+        l_Track.SetPitLane(l_PitLane, 0.0f, 0.0f);
 
         RaceController l_Controller(l_Track.GetLength(), 2, l_Start);
+        l_Controller.SetPitStrategy(0, 1);
+        l_Controller.SetPitStrategy(1, 1);
+
         RaceSimulation l_Simulation(l_Track, l_Start, l_Controller);
         const double l_FixedTimeStep = 1.0 / 60.0;
         double l_LastTime = l_Start;

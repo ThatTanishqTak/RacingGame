@@ -9,6 +9,7 @@ namespace
     constexpr float kMaxLongitudinalAccel = 5.0f;
     constexpr float kMaxBrakeAccel = 10.0f;
     constexpr float kMaxLateralAccel = 10.0f;
+    constexpr float kPitSpeedLimit = 20.0f;
 }
 
 RaceSimulation::RaceSimulation(const Track& track, double startTime, RaceController& controller) : m_Track(track), m_SimulationTime(startTime), m_Controller(controller)
@@ -19,6 +20,7 @@ RaceSimulation::RaceSimulation(const Track& track, double startTime, RaceControl
     m_Cars.resize(m_Vehicles.size());
     m_Controllers.reserve(m_Vehicles.size());
     m_Progress.resize(m_Vehicles.size(), 0.0f);
+    m_InPitLane.resize(m_Vehicles.size(), false);
     for (size_t i = 0; i < m_Vehicles.size(); ++i)
     {
         m_Cars[i].ID = static_cast<int>(i);
@@ -57,6 +59,7 @@ void RaceSimulation::Update(double deltaTime)
     m_SimulationTime += deltaTime;
 
     const auto& a_Arc = m_Track.GetArcLengthTable();
+    std::vector<float> l_Speeds(m_Vehicles.size(), 0.0f);
     for (size_t i = 0; i < m_Vehicles.size(); ++i)
     {
         Vehicle& l_Vehicle = m_Vehicles[i];
@@ -171,6 +174,12 @@ void RaceSimulation::Update(double deltaTime)
 
         l_Acceleration = std::clamp(l_Acceleration, -kMaxBrakeAccel, kMaxLongitudinalAccel);
         l_Vehicle.SetSpeed(std::max(0.0f, l_Vehicle.GetSpeed() + l_Acceleration * static_cast<float>(deltaTime)));
+        if (m_Track.IsInPitLane(l_Position))
+        {
+            l_Vehicle.SetSpeed(std::min(l_Vehicle.GetSpeed(), kPitSpeedLimit));
+        }
+
+        l_Speeds[i] = l_Vehicle.GetSpeed();
 
         float l_YawRate = 0.0f;
         if (std::abs(l_Vehicle.GetSteering()) > 0.0f)
@@ -194,6 +203,7 @@ void RaceSimulation::Update(double deltaTime)
         }
 
         m_Progress[i] = l_NewProgress;
+        m_InPitLane[i] = m_Track.IsInPitLane(l_NewProgress);
 
         m_Cars[i].ID = static_cast<int>(i);
         m_Cars[i].Position = l_Vehicle.GetPosition();
@@ -201,5 +211,5 @@ void RaceSimulation::Update(double deltaTime)
         m_Cars[i].Speed = l_Vehicle.GetSpeed();
     }
 
-    m_Controller.Update(m_SimulationTime, m_Progress);
+    m_Controller.Update(m_SimulationTime, deltaTime, m_Progress, m_InPitLane, l_Speeds);
 }

@@ -27,7 +27,8 @@ public:
 public:
     RaceController(float trackLength, int carCount, double startTime = 0.0);
 
-    void Update(double currentTime, const std::vector<float>& progress);
+    void Update(double currentTime, double deltaTime, const std::vector<float>& progress, const std::vector<bool>& inPitLane, const std::vector<float>& speeds);
+    void SetPitStrategy(int carId, int mandatoryStops);
 
     State GetState() const { return m_State; }
     const std::vector<ClassificationEntry>& GetClassification() const { return m_Classification; }
@@ -42,6 +43,13 @@ private:
         std::array<double, 3> LastSectorTimes{ 0.0, 0.0, 0.0 };
         double LastLapTime{ 0.0 };
         float LastProgress{ 0.0f };
+        bool InPitLane{ false };
+        int StopsDone{ 0 };
+        int MandatoryStops{ 1 };
+        bool PitStopCompleted{ false };
+        double PitEntryTime{ 0.0 };
+        double ServiceTime{ 0.0 };
+        double PitExitDelta{ 0.0 };
     };
 
 private:

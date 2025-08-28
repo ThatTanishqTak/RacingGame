@@ -13,6 +13,7 @@ namespace Engine
         float Speed;
         float DistanceToCarAhead{ 0.0f };
         float RelativeSpeedToCarAhead{ 0.0f };
+        bool InPitLane{ false };
     };
 
     struct Snapshot

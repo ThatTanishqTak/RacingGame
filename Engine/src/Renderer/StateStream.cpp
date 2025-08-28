@@ -40,6 +40,7 @@ namespace Engine
                     l_Result[i].Speed += (l_Snapshot1.Cars[i].Speed - l_Result[i].Speed) * static_cast<float>(l_Alpha);
                     l_Result[i].DistanceToCarAhead += (l_Snapshot1.Cars[i].DistanceToCarAhead - l_Result[i].DistanceToCarAhead) * static_cast<float>(l_Alpha);
                     l_Result[i].RelativeSpeedToCarAhead += (l_Snapshot1.Cars[i].RelativeSpeedToCarAhead - l_Result[i].RelativeSpeedToCarAhead) * static_cast<float>(l_Alpha);
+                    l_Result[i].InPitLane = l_Alpha < 0.5 ? l_Snapshot0.Cars[i].InPitLane : l_Snapshot1.Cars[i].InPitLane;
                 }
             }
 
@@ -62,6 +63,7 @@ namespace Engine
                     l_Result[i].Speed += (l_Snapshot1.Cars[i].Speed - l_Snapshot0.Cars[i].Speed) * static_cast<float>(l_Alpha);
                     l_Result[i].DistanceToCarAhead += (l_Snapshot1.Cars[i].DistanceToCarAhead - l_Snapshot0.Cars[i].DistanceToCarAhead) * static_cast<float>(l_Alpha);
                     l_Result[i].RelativeSpeedToCarAhead += (l_Snapshot1.Cars[i].RelativeSpeedToCarAhead - l_Snapshot0.Cars[i].RelativeSpeedToCarAhead) * static_cast<float>(l_Alpha);
+                    l_Result[i].InPitLane = l_Alpha < 0.5 ? l_Snapshot0.Cars[i].InPitLane : l_Snapshot1.Cars[i].InPitLane;
                 }
             }
 
@@ -82,6 +84,7 @@ namespace Engine
             l_Result[i].Speed += (l_Snapshot1.Cars[i].Speed - l_Result[i].Speed) * static_cast<float>(l_Alpha);
             l_Result[i].DistanceToCarAhead += (l_Snapshot1.Cars[i].DistanceToCarAhead - l_Result[i].DistanceToCarAhead) * static_cast<float>(l_Alpha);
             l_Result[i].RelativeSpeedToCarAhead += (l_Snapshot1.Cars[i].RelativeSpeedToCarAhead - l_Result[i].RelativeSpeedToCarAhead) * static_cast<float>(l_Alpha);
+            l_Result[i].InPitLane = l_Alpha < 0.5 ? l_Snapshot0.Cars[i].InPitLane : l_Snapshot1.Cars[i].InPitLane;
         }
 
         return l_Result;

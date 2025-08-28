@@ -28,6 +28,7 @@ private:
     std::vector<PurePursuit> m_Controllers;
     std::vector<Engine::CarState> m_Cars;
     std::vector<float> m_Progress;
+    std::vector<bool> m_InPitLane;
     std::vector<float> m_SpeedTable;
     float m_TrackLength{ 0.0f };
 };
