@@ -33,18 +33,19 @@ public:
     void Run() override
     {
         double l_Start = glfwGetTime();
-        RaceSimulation l_Sim(l_Start);
-        const double l_FixedTimeStep = 1.0 / 60.0;
-        double l_LastTime = l_Start;
-        double l_Accumulator = 0.0;
 
-        Circuit l_Circuit("Sample l_Track", 5.0);
+        Circuit l_Circuit("Sample track", 5.0);
         l_Circuit.LoadLayout("Assets/Tracks/SampleTrack.txt");
 
         Track l_Track;
         l_Track.SetCenterline(l_Circuit.GetCenterline());
         std::vector<float> l_Widths(l_Circuit.GetCenterline().size(), l_Circuit.GetHalfWidth() * 2.0f);
         l_Track.SetWidthProfile(l_Widths);
+
+        RaceSimulation l_Sim(l_Track, l_Start);
+        const double l_FixedTimeStep = 1.0 / 60.0;
+        double l_LastTime = l_Start;
+        double l_Accumulator = 0.0;
 
         Engine::g_Renderer->SetTrackCenterline(l_Track.GetCenterline(), l_Circuit.GetHalfWidth());
 

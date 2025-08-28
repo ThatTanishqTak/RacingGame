@@ -7,7 +7,9 @@ void Track::SetCenterline(const std::vector<glm::vec2>& points)
 {
     Centerline = points;
 
+    ComputeRacingLine();
     BuildArcLengthTable();
+    ComputeCurvature();
     UpdateBounds();
 }
 
@@ -26,16 +28,16 @@ void Track::BuildArcLengthTable()
     ArcLengthTable.clear();
     ArcLengthTable.push_back(0.0f);
     float l_Total = 0.0f;
-    for (size_t i = 1; i < Centerline.size(); ++i)
+    for (size_t i = 1; i < RacingLine.size(); ++i)
     {
-        l_Total += glm::length(Centerline[i] - Centerline[i - 1]);
+        l_Total += glm::length(RacingLine[i] - RacingLine[i - 1]);
         ArcLengthTable.push_back(l_Total);
     }
 }
 
 glm::vec2 Track::PositionAt(float positionAt) const
 {
-    if (Centerline.size() < 2 || ArcLengthTable.empty())
+    if (RacingLine.size() < 2 || ArcLengthTable.empty())
     {
         return {};
     }
@@ -43,7 +45,7 @@ glm::vec2 Track::PositionAt(float positionAt) const
     float l_Total = ArcLengthTable.back();
     if (l_Total <= 0.0f)
     {
-        return Centerline.front();
+        return RacingLine.front();
     }
 
     positionAt = std::fmod(positionAt, l_Total);
@@ -56,39 +58,70 @@ glm::vec2 Track::PositionAt(float positionAt) const
     size_t l_Index = std::distance(ArcLengthTable.begin(), it);
     if (l_Index == 0)
     {
-        return Centerline.front();
+        return RacingLine.front();
     }
 
     float l_SegmentLength = ArcLengthTable[l_Index] - ArcLengthTable[l_Index - 1];
     float l_Temp = l_SegmentLength > 0.0f ? (positionAt - ArcLengthTable[l_Index - 1]) / l_SegmentLength : 0.0f;
 
-    return glm::mix(Centerline[l_Index - 1], Centerline[l_Index], l_Temp);
+    return glm::mix(RacingLine[l_Index - 1], RacingLine[l_Index], l_Temp);
+}
+
+void Track::ComputeRacingLine()
+{
+    RacingLine = Centerline;
+}
+
+void Track::ComputeCurvature()
+{
+    Curvature.assign(RacingLine.size(), 0.0f);
+    for (size_t i = 1; i + 1 < RacingLine.size(); ++i)
+    {
+        glm::vec2 p0 = RacingLine[i - 1];
+        glm::vec2 p1 = RacingLine[i];
+        glm::vec2 p2 = RacingLine[i + 1];
+        glm::vec2 v1 = p1 - p0;
+        glm::vec2 v2 = p2 - p1;
+        float a = glm::length(v1);
+        float b = glm::length(v2);
+        if (a > 0.0f && b > 0.0f)
+        {
+            float cross = v1.x * v2.y - v1.y * v2.x;
+            float dot = glm::dot(v1, v2);
+            float angle = std::atan2(cross, dot);
+            float avgLen = 0.5f * (a + b);
+            if (avgLen > 0.0f)
+            {
+                Curvature[i] = angle / avgLen;
+            }
+        }
+    }
 }
 
 void Track::UpdateBounds()
 {
-    if (Centerline.empty())
+    if (RacingLine.empty())
     {
         Min = Max = { 0.0f, 0.0f };
 
         return;
     }
 
-    Min = Max = Centerline.front();
-    for (size_t i = 0; i < Centerline.size(); ++i)
+    Min = Max = RacingLine.front();
+    for (size_t i = 0; i < RacingLine.size(); ++i)
     {
-        glm::vec2 P = Centerline[i];
+        glm::vec2 P = RacingLine[i];
         float W = (i < Widths.size()) ? Widths[i] * 0.5f : 0.0f;
 
         glm::vec2 Dir{ 0.0f };
-        if (i + 1 < Centerline.size())
+        if (i + 1 < RacingLine.size())
         {
-            Dir = glm::normalize(Centerline[i + 1] - P);
+            Dir = glm::normalize(RacingLine[i + 1] - P);
         }
-        
+
         else if (i > 0)
         {
-            Dir = glm::normalize(P - Centerline[i - 1]);
+            Dir = glm::normalize(P - RacingLine[i - 1]);
         }
 
         glm::vec2 Normal(-Dir.y, Dir.x);

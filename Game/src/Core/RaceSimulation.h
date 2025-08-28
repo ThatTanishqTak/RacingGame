@@ -2,20 +2,30 @@
 
 #include "Renderer/StateStream.h"
 #include "Vehicle.h"
+#include "Track.h"
+#include "Controller/PurePursuit.h"
 
 #include <vector>
 
 class RaceSimulation
 {
 public:
-    explicit RaceSimulation(double startTime);
+    RaceSimulation(const Track& track, double startTime);
 
     void Update(double deltaTime);
     double GetTime() const { return m_SimulationTime; }
     const std::vector<Engine::CarState>& GetCars() const { return m_Cars; }
 
 private:
+    void BuildSpeedTable();
+
+private:
+    const Track& m_Track;
     double m_SimulationTime;
     std::vector<Vehicle> m_Vehicles;
+    std::vector<PurePursuit> m_Controllers;
     std::vector<Engine::CarState> m_Cars;
+    std::vector<float> m_Progress;
+    std::vector<float> m_SpeedTable;
+    float m_TrackLength{ 0.0f };
 };
