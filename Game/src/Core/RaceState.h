@@ -59,6 +59,7 @@ struct RaceState
     std::vector<DriverInfo> Drivers;
     std::vector<int> Positions;
     std::vector<float> Intervals;
+    std::vector<int> Laps;
     std::string FlagStatus;
     std::vector<std::string> TrackLayout;
 };

@@ -17,8 +17,6 @@
 #include <imgui.h>
 #include <vector>
 
-static bool s_TogglePressed = false;
-
 class Game : public Engine::Application
 {
 public:
@@ -98,16 +96,6 @@ public:
                 l_CameraController.SelectCar(0);
                 l_SwitchedToFollow = true;
             }
-
-            bool l_TabDown = !ImGui::GetIO().WantCaptureKeyboard && m_Window->IsKeyPressed(GLFW_KEY_TAB);
-            if (l_TabDown && !s_TogglePressed)
-            {
-                auto a_Mode = GetViewMode() == Engine::Renderer::ViewMode::View3D ? Engine::Renderer::ViewMode::View2DTopDown : Engine::Renderer::ViewMode::View3D;
-                SetViewMode(a_Mode);
-
-                g_EventBus.Publish(ViewModeToggle{ a_Mode == Engine::Renderer::ViewMode::View2DTopDown });
-            }
-            s_TogglePressed = l_TabDown;
 
             m_ImGuiLayer->BeginFrame();
             m_Renderer->BeginFrame();

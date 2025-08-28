@@ -5,10 +5,10 @@
 #include <string>
 #include <vector>
 
-class RaceDashboard
+class RaceDashboardPanel
 {
 public:
-    RaceDashboard();
+    RaceDashboardPanel();
     void Render(const RaceState& state);
 
 private:

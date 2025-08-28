@@ -1,4 +1,5 @@
-#include "RaceDashboard.h"
+#include "RaceDashboardPanel.h"
+
 #include "Core/PaletteManager.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/StateStream.h"
@@ -9,7 +10,7 @@
 
 #include <algorithm>
 
-RaceDashboard::RaceDashboard()
+RaceDashboardPanel::RaceDashboardPanel()
 {
     g_EventBus.Subscribe<PitIn>([this](const PitIn& e) { m_Toasts.push_back(e.DriverName + " entered pit"); });
     g_EventBus.Subscribe<PitOut>([this](const PitOut& e) { m_Toasts.push_back(e.DriverName + " exited pit"); });
@@ -17,7 +18,7 @@ RaceDashboard::RaceDashboard()
     g_EventBus.Subscribe<ViewModeToggle>([this](const ViewModeToggle& e) { m_TopDownView = e.TopDown; });
 }
 
-void RaceDashboard::Render(const RaceState& state)
+void RaceDashboardPanel::Render(const RaceState& state)
 {
     RenderPitCrewPanel(state);
     RenderRaceInfoPanel(state);
@@ -28,7 +29,7 @@ void RaceDashboard::Render(const RaceState& state)
     RenderSettingsPanel();
 }
 
-void RaceDashboard::RenderPitCrewPanel(const RaceState& state)
+void RaceDashboardPanel::RenderPitCrewPanel(const RaceState& state)
 {
     if (ImGui::Begin("Pit Crew"))
     {
@@ -37,7 +38,7 @@ void RaceDashboard::RenderPitCrewPanel(const RaceState& state)
     ImGui::End();
 }
 
-void RaceDashboard::RenderRaceInfoPanel(const RaceState& state)
+void RaceDashboardPanel::RenderRaceInfoPanel(const RaceState& state)
 {
     if (ImGui::Begin("Race Info"))
     {
@@ -50,7 +51,7 @@ void RaceDashboard::RenderRaceInfoPanel(const RaceState& state)
     ImGui::End();
 }
 
-void RaceDashboard::RenderTrackViewPanel(const RaceState& state)
+void RaceDashboardPanel::RenderTrackViewPanel(const RaceState& state)
 {
     if (ImGui::Begin("Live"))
     {
@@ -252,7 +253,7 @@ void RaceDashboard::RenderTrackViewPanel(const RaceState& state)
     ImGui::End();
 }
 
-void RaceDashboard::RenderDriverPanels(const RaceState& state)
+void RaceDashboardPanel::RenderDriverPanels(const RaceState& state)
 {
     if (ImGui::Begin("Drivers"))
     {
@@ -265,7 +266,7 @@ void RaceDashboard::RenderDriverPanels(const RaceState& state)
     ImGui::End();
 }
 
-void RaceDashboard::RenderScoreboardPanel(const RaceState& state) 
+void RaceDashboardPanel::RenderScoreboardPanel(const RaceState& state) 
 {
     if (ImGui::Begin("Positions")) 
     {
@@ -284,7 +285,7 @@ void RaceDashboard::RenderScoreboardPanel(const RaceState& state)
     ImGui::End();
 }
 
-void RaceDashboard::RenderToasts() 
+void RaceDashboardPanel::RenderToasts() 
 {
     if (ImGui::Begin("HUD Toasts")) 
     {
@@ -296,7 +297,7 @@ void RaceDashboard::RenderToasts()
     ImGui::End();
 }
 
-void RaceDashboard::RenderSettingsPanel()
+void RaceDashboardPanel::RenderSettingsPanel()
 {
     if (ImGui::Begin("Settings"))
     {
