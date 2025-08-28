@@ -1,6 +1,7 @@
 #include "FinanceManager.h"
+#include "RaceConfiguration.h"
 
-FinanceManager::FinanceManager(double initialBudget) : m_TotalBudget(initialBudget), m_Expenses(0.0), m_Rng(std::random_device{}())
+FinanceManager::FinanceManager(double initialBudget) : m_TotalBudget(initialBudget), m_Expenses(0.0), m_Rng(CreateRandomGenerator())
 {
 
 }

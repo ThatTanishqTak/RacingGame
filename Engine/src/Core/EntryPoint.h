@@ -2,15 +2,15 @@
 
 namespace Engine
 {
-	Application* CreateApplication();
+    Application* CreateApplication(int argc, char** argv);
 }
 
-int main()
+int main(int argc, char** argv)
 {
-	auto a_App = Engine::CreateApplication();
-	a_App->Run();
+    auto a_App = Engine::CreateApplication(argc, argv);
+    a_App->Run();
 
-	delete a_App;
+    delete a_App;
 
-	return 0;
+    return 0;
 }

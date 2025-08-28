@@ -1,6 +1,7 @@
 #include "DevelopmentManager.h"
+#include "RaceConfiguration.h"
 
-DevelopmentManager::DevelopmentManager(FinanceManager& finance) : m_Finance(finance), m_Rng(std::random_device{}())
+DevelopmentManager::DevelopmentManager(FinanceManager& finance) : m_Finance(finance), m_Rng(CreateRandomGenerator())
 {
 
 }

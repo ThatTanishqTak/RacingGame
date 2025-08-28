@@ -4,6 +4,7 @@
 #include "Core/Driver.h"
 #include "Core/EventBus.h"
 #include "Core/RaceState.h"
+#include "Core/RaceConfiguration.h"
 
 #include <algorithm>
 #include <random>
@@ -26,12 +27,12 @@ const std::string& Race::GetDate() const
 std::vector<SessionResult> Race::GenerateResults(const std::vector<std::shared_ptr<Driver>>& drivers)
 {
     std::vector<SessionResult> l_Results;
-    std::mt19937 l_randomNumber{ std::random_device{}() };
-    std::uniform_real_distribution<double> l_distribution(60.0, 120.0);
+    std::mt19937 l_Rng = CreateRandomGenerator();
+    std::uniform_real_distribution<double> l_Distribution(60.0, 120.0);
 
     for (const auto& it_Driver : drivers)
     {
-        l_Results.push_back({ it_Driver, l_distribution(l_randomNumber) });
+        l_Results.push_back({ it_Driver, l_Distribution(l_Rng) });
     }
 
     std::sort(l_Results.begin(), l_Results.end(), [](const SessionResult& a, const SessionResult& b)
@@ -60,12 +61,12 @@ std::vector<SessionResult> Race::ConductRace(const std::vector<std::shared_ptr<D
 {
     RaceResults = GenerateResults(drivers);
 
-    std::mt19937 l_randomNumber{ std::random_device{}() };
-    std::uniform_real_distribution<double> l_distribution(0.0, 1.0);
+    std::mt19937 l_Rng = CreateRandomGenerator();
+    std::uniform_real_distribution<double> l_Distribution(0.0, 1.0);
 
     for (const auto& it_Driver : drivers)
     {
-        double l_Chance = l_distribution(l_randomNumber);
+        double l_Chance = l_Distribution(l_Rng);
         if (l_Chance < 0.1)
         {
             g_EventBus.Publish(PitIn{ it_Driver->GetName() });
