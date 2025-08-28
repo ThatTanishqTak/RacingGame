@@ -33,6 +33,19 @@ struct Overtake
     std::string Overtaken;
 };
 
+struct GreenFlag
+{
+};
+
+struct YellowFlag
+{
+};
+
+struct BlueFlag
+{
+    int CarID;
+};
+
 struct ViewModeToggle
 {
     bool TopDown;

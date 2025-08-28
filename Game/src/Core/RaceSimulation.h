@@ -4,13 +4,14 @@
 #include "Vehicle.h"
 #include "Track.h"
 #include "Controller/PurePursuit.h"
+#include "Controller/RaceController.h"
 
 #include <vector>
 
 class RaceSimulation
 {
 public:
-    RaceSimulation(const Track& track, double startTime);
+    RaceSimulation(const Track& track, double startTime, RaceController& controller);
 
     void Update(double deltaTime);
     double GetTime() const { return m_SimulationTime; }
@@ -22,6 +23,7 @@ private:
 private:
     const Track& m_Track;
     double m_SimulationTime;
+    RaceController& m_Controller;
     std::vector<Vehicle> m_Vehicles;
     std::vector<PurePursuit> m_Controllers;
     std::vector<Engine::CarState> m_Cars;

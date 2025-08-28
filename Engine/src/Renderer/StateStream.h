@@ -11,6 +11,8 @@ namespace Engine
         glm::vec3 Position;
         float Yaw;
         float Speed;
+        float DistanceToCarAhead{ 0.0f };
+        float RelativeSpeedToCarAhead{ 0.0f };
     };
 
     struct Snapshot

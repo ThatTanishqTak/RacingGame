@@ -11,6 +11,8 @@
 #include "Core/Circuit.h"
 #include "Core/Track.h"
 
+#include "Controller/RaceController.h"
+
 #include <GLFW/glfw3.h>
 #include <imgui.h>
 #include <vector>
@@ -42,7 +44,8 @@ public:
         std::vector<float> l_Widths(l_Circuit.GetCenterline().size(), l_Circuit.GetHalfWidth() * 2.0f);
         l_Track.SetWidthProfile(l_Widths);
 
-        RaceSimulation l_Sim(l_Track, l_Start);
+        RaceController l_Controller(l_Track.GetLength(), 2, l_Start);
+        RaceSimulation l_Simulation(l_Track, l_Start, l_Controller);
         const double l_FixedTimeStep = 1.0 / 60.0;
         double l_LastTime = l_Start;
         double l_Accumulator = 0.0;
@@ -54,9 +57,9 @@ public:
         
         auto [l_MinBounds, l_MaxBounds] = l_Track.Bounds();
         l_CameraController.SetTrackBounds(l_MinBounds, l_MaxBounds);
-        l_CameraController.SetCarPositionProvider([&l_Sim](int id) 
+        l_CameraController.SetCarPositionProvider([&l_Simulation](int id) 
             {
-                const auto& l_Cars = l_Sim.GetCars();
+                const auto& l_Cars = l_Simulation.GetCars();
                 if (id >= 0 && id < (int)l_Cars.size())
                 {
                     return glm::vec2(l_Cars[id].Position.x, l_Cars[id].Position.z);
@@ -77,8 +80,8 @@ public:
 
             while (l_Accumulator >= l_FixedTimeStep)
             {
-                l_Sim.Update(l_FixedTimeStep);
-                Engine::g_StateBuffer.SubmitSnapshot({ l_Sim.GetTime(), l_Sim.GetCars() });
+                l_Simulation.Update(l_FixedTimeStep);
+                Engine::g_StateBuffer.SubmitSnapshot({ l_Simulation.GetTime(), l_Simulation.GetCars() });
                 l_Accumulator -= l_FixedTimeStep;
             }
 

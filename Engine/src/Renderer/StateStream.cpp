@@ -38,6 +38,8 @@ namespace Engine
                     l_Result[i].Position += (l_Snapshot1.Cars[i].Position - l_Result[i].Position) * static_cast<float>(l_Alpha);
                     l_Result[i].Yaw += (l_Snapshot1.Cars[i].Yaw - l_Result[i].Yaw) * static_cast<float>(l_Alpha);
                     l_Result[i].Speed += (l_Snapshot1.Cars[i].Speed - l_Result[i].Speed) * static_cast<float>(l_Alpha);
+                    l_Result[i].DistanceToCarAhead += (l_Snapshot1.Cars[i].DistanceToCarAhead - l_Result[i].DistanceToCarAhead) * static_cast<float>(l_Alpha);
+                    l_Result[i].RelativeSpeedToCarAhead += (l_Snapshot1.Cars[i].RelativeSpeedToCarAhead - l_Result[i].RelativeSpeedToCarAhead) * static_cast<float>(l_Alpha);
                 }
             }
 
@@ -58,6 +60,8 @@ namespace Engine
                     l_Result[i].Position += (l_Snapshot1.Cars[i].Position - l_Snapshot0.Cars[i].Position) * static_cast<float>(l_Alpha);
                     l_Result[i].Yaw += (l_Snapshot1.Cars[i].Yaw - l_Snapshot0.Cars[i].Yaw) * static_cast<float>(l_Alpha);
                     l_Result[i].Speed += (l_Snapshot1.Cars[i].Speed - l_Snapshot0.Cars[i].Speed) * static_cast<float>(l_Alpha);
+                    l_Result[i].DistanceToCarAhead += (l_Snapshot1.Cars[i].DistanceToCarAhead - l_Snapshot0.Cars[i].DistanceToCarAhead) * static_cast<float>(l_Alpha);
+                    l_Result[i].RelativeSpeedToCarAhead += (l_Snapshot1.Cars[i].RelativeSpeedToCarAhead - l_Snapshot0.Cars[i].RelativeSpeedToCarAhead) * static_cast<float>(l_Alpha);
                 }
             }
 
@@ -74,6 +78,10 @@ namespace Engine
         for (std::size_t i = 0; i < l_Result.size() && i < l_Snapshot1.Cars.size(); ++i)
         {
             l_Result[i].Position += (l_Snapshot1.Cars[i].Position - l_Result[i].Position) * static_cast<float>(l_Alpha);
+            l_Result[i].Yaw += (l_Snapshot1.Cars[i].Yaw - l_Result[i].Yaw) * static_cast<float>(l_Alpha);
+            l_Result[i].Speed += (l_Snapshot1.Cars[i].Speed - l_Result[i].Speed) * static_cast<float>(l_Alpha);
+            l_Result[i].DistanceToCarAhead += (l_Snapshot1.Cars[i].DistanceToCarAhead - l_Result[i].DistanceToCarAhead) * static_cast<float>(l_Alpha);
+            l_Result[i].RelativeSpeedToCarAhead += (l_Snapshot1.Cars[i].RelativeSpeedToCarAhead - l_Result[i].RelativeSpeedToCarAhead) * static_cast<float>(l_Alpha);
         }
 
         return l_Result;
