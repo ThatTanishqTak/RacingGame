@@ -91,7 +91,12 @@ void RaceDashboardPanel::RenderTrackViewPanel(const RaceState& state)
 
             auto a_CellMininum = [&](int x, int y) { return ImVec2(l_TrackMinimum.x + x * l_TileWidth, l_TrackMinimum.y + y * l_TileHeight); };
             auto a_CellMaximum = [&](int x, int y) { return ImVec2(l_TrackMinimum.x + (x + 1) * l_TileWidth, l_TrackMinimum.y + (y + 1) * l_TileHeight); };
-            auto a_CellCenter = [&](int x, int y) { ImVec2 l_Minimum = a_CellMininum(x, y), l_Maximum = a_CellMaximum(x, y); return ImVec2((l_Minimum.x + l_Maximum.x) * 0.5f, (l_Minimum.y + l_Maximum.y) * 0.5f); };
+            auto a_CellCenter = [&](int x, int y)
+                { 
+                    ImVec2 l_Minimum = a_CellMininum(x, y), l_Maximum = a_CellMaximum(x, y);
+                    
+                    return ImVec2((l_Minimum.x + l_Maximum.x) * 0.5f, (l_Minimum.y + l_Maximum.y) * 0.5f);
+                };
 
             // Stroke thickness and padding in pixels (based on the *smaller* tile dimension)
             const float l_Base = std::min(l_TileWidth, l_TileHeight);
