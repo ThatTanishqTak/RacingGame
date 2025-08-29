@@ -27,6 +27,9 @@ target_include_directories(glm INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/vendor/glm>       
 )
 
+# Assimp
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/vendor/assimp)
+
 # Engine source files
 file(GLOB_RECURSE ENGINE_SOURCE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
@@ -67,6 +70,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     GLFW
     GLAD
     glm
+    assimp
 )
 if (WIN32)
     target_link_libraries(${PROJECT_NAME} PUBLIC opengl32)
