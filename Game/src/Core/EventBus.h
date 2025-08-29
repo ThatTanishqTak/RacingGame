@@ -20,7 +20,8 @@ public:
         int l_Token = m_NextToken++;
         auto& a_Handlers = m_Subscribers[typeid(Event)];
         a_Handlers.emplace_back(l_Token, [handler](const void* e) { handler(*static_cast<const Event*>(e)); });
-        m_TokenTypes[l_Token] = typeid(Event);
+        m_TokenTypes.emplace(l_Token, typeid(Event));
+
         return l_Token;
     }
 
