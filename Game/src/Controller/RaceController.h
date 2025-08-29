@@ -5,6 +5,8 @@
 
 #include "Renderer/StateStream.h"
 
+class EventBus;
+
 class RaceController
 {
 public:
@@ -25,7 +27,7 @@ public:
     };
 
 public:
-    RaceController(float trackLength, int carCount, double startTime = 0.0);
+    RaceController(EventBus& eventBus, float trackLength, int carCount, double startTime = 0.0);
 
     void Update(double currentTime, double deltaTime, const std::vector<float>& progress, const std::vector<bool>& inPitLane, const std::vector<float>& speeds);
     void SetPitStrategy(int carId, int mandatoryStops);
@@ -58,6 +60,7 @@ private:
     void CheckBlueFlags();
 
 private:
+    EventBus& m_EventBus;
     State m_State{ State::PreRace };
     float m_TrackLength;
     std::vector<DriverTiming> m_Timing;

@@ -4,7 +4,7 @@
 #include "Core/EventBus.h"
 #include "Core/RaceState.h"
 
-RaceController::RaceController(float trackLength, int carCount, double startTime) : m_TrackLength(trackLength)
+RaceController::RaceController(EventBus& eventBus, float trackLength, int carCount, double startTime) : m_EventBus(eventBus), m_TrackLength(trackLength)
 {
     m_Timing.resize(carCount);
     for (auto& it_Time : m_Timing)
@@ -99,10 +99,10 @@ void RaceController::ChangeState(State newState)
     switch (m_State)
     {
     case State::Green:
-        g_EventBus.Publish(GreenFlag{});
+        m_EventBus.Publish(GreenFlag{});
         break;
     case State::Yellow:
-        g_EventBus.Publish(YellowFlag{});
+        m_EventBus.Publish(YellowFlag{});
         break;
     default:
         break;
@@ -167,7 +167,7 @@ void RaceController::CheckBlueFlags()
 
         if (l_LapDifference > 0 && l_Distance < 50.0f)
         {
-            g_EventBus.Publish(BlueFlag{ it_Entry.CarID });
+            m_EventBus.Publish(BlueFlag{ it_Entry.CarID });
         }
     }
 }

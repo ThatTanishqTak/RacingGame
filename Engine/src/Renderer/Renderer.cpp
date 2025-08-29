@@ -17,8 +17,6 @@
 
 namespace Engine
 {
-    Renderer* g_Renderer = nullptr;
-
     namespace
     {
         std::string ReadFile(const std::string& path)

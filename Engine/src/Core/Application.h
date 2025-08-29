@@ -22,9 +22,6 @@ namespace Engine
         {
             while (!m_Window->WindowShouldClose())
             {
-                glm::mat4 l_View = m_Camera->GetViewMatrix(); (void)l_View;
-                glm::mat4 l_Projection = m_Camera->GetProjectionMatrix(); (void)l_Projection;
-
                 m_ImGuiLayer->BeginFrame();
                 m_Renderer->BeginFrame();
                 m_Renderer->EndFrame();

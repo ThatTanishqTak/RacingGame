@@ -1,14 +1,17 @@
 #pragma once
 
 #include "Core/RaceState.h"
-#include "Core/EventBus.h"
 #include <string>
 #include <vector>
+
+class EventBus;
+namespace Engine { class Renderer; }
 
 class RaceDashboardPanel
 {
 public:
-    RaceDashboardPanel();
+    RaceDashboardPanel(EventBus& eventBus, Engine::Renderer& renderer);
+    ~RaceDashboardPanel();
     void Render(const RaceState& state);
 
 private:
@@ -21,6 +24,8 @@ private:
     void RenderSettingsPanel();
 
 private:
+    EventBus& m_EventBus;
+    Engine::Renderer& m_Renderer;
     std::vector<std::string> m_Toasts;
     bool m_ColourBlindMode = false;
     bool m_TopDownView = false;
@@ -31,4 +36,8 @@ private:
     float m_TrackThickness = 0.22f;
     float m_TrackPadding = 0.12f;
     float m_CarRadiusPx = 7.0f;
+    int m_PitInToken = 0;
+    int m_PitOutToken = 0;
+    int m_DNFToken = 0;
+    int m_ViewModeToken = 0;
 };

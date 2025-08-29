@@ -57,7 +57,7 @@ std::vector<SessionResult> Race::ConductQualifying(const std::vector<std::shared
     return QualifyingResults;
 }
 
-std::vector<SessionResult> Race::ConductRace(const std::vector<std::shared_ptr<Driver>>& drivers)
+std::vector<SessionResult> Race::ConductRace(const std::vector<std::shared_ptr<Driver>>& drivers, EventBus& eventBus)
 {
     RaceResults = GenerateResults(drivers);
 
@@ -69,13 +69,13 @@ std::vector<SessionResult> Race::ConductRace(const std::vector<std::shared_ptr<D
         double l_Chance = l_Distribution(l_Rng);
         if (l_Chance < 0.1)
         {
-            g_EventBus.Publish(PitIn{ it_Driver->GetName() });
-            g_EventBus.Publish(PitOut{ it_Driver->GetName() });
+            eventBus.Publish(PitIn{ it_Driver->GetName() });
+            eventBus.Publish(PitOut{ it_Driver->GetName() });
         }
 
         else if (l_Chance < 0.15)
         {
-            g_EventBus.Publish(DNF{ it_Driver->GetName(), "mechanical failure" });
+            eventBus.Publish(DNF{ it_Driver->GetName(), "mechanical failure" });
         }
     }
 

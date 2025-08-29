@@ -1,6 +1,7 @@
 #include "RaceDashboardPanel.h"
 
 #include "Core/PaletteManager.h"
+#include "Core/EventBus.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/StateStream.h"
 
@@ -10,12 +11,20 @@
 
 #include <algorithm>
 
-RaceDashboardPanel::RaceDashboardPanel()
+RaceDashboardPanel::RaceDashboardPanel(EventBus& eventBus, Engine::Renderer& renderer) : m_EventBus(eventBus), m_Renderer(renderer)
 {
-    g_EventBus.Subscribe<PitIn>([this](const PitIn& e) { m_Toasts.push_back(e.DriverName + " entered pit"); });
-    g_EventBus.Subscribe<PitOut>([this](const PitOut& e) { m_Toasts.push_back(e.DriverName + " exited pit"); });
-    g_EventBus.Subscribe<DNF>([this](const DNF& e) { m_Toasts.push_back(e.DriverName + " DNF: " + e.Reason); });
-    g_EventBus.Subscribe<ViewModeToggle>([this](const ViewModeToggle& e) { m_TopDownView = e.TopDown; });
+    m_EventBus.Subscribe<PitIn>([this](const PitIn& e) { m_Toasts.push_back(e.DriverName + " entered pit"); });
+    m_EventBus.Subscribe<PitOut>([this](const PitOut& e) { m_Toasts.push_back(e.DriverName + " exited pit"); });
+    m_EventBus.Subscribe<DNF>([this](const DNF& e) { m_Toasts.push_back(e.DriverName + " DNF: " + e.Reason); });
+    m_EventBus.Subscribe<ViewModeToggle>([this](const ViewModeToggle& e) { m_TopDownView = e.TopDown; });
+}
+
+RaceDashboardPanel::~RaceDashboardPanel()
+{
+    g_EventBus.Unsubscribe(m_PitInToken);
+    g_EventBus.Unsubscribe(m_PitOutToken);
+    g_EventBus.Unsubscribe(m_DNFToken);
+    g_EventBus.Unsubscribe(m_ViewModeToken);
 }
 
 void RaceDashboardPanel::Render(const RaceState& state)
@@ -183,11 +192,8 @@ void RaceDashboardPanel::RenderTrackViewPanel(const RaceState& state)
             {
                 glm::vec2 l_Min{ -5.0f, -10.0f };
                 glm::vec2 l_Max{ 5.0f, 10.0f };
-                if (Engine::g_Renderer)
-                {
-                    l_Min = Engine::g_Renderer->GetTrackMin();
-                    l_Max = Engine::g_Renderer->GetTrackMax();
-                }
+                l_Min = m_Renderer.GetTrackMin();
+                l_Max = m_Renderer.GetTrackMax();
 
                 const float l_WorldMinimumX = l_Min.x;
                 const float l_WorldMaximumX = l_Max.x;
@@ -304,7 +310,7 @@ void RaceDashboardPanel::RenderSettingsPanel()
         ImGui::Checkbox("Colour Blind Mode", &m_ColourBlindMode);
         if (ImGui::Checkbox("Top Down View", &m_TopDownView))
         {
-            g_EventBus.Publish(ViewModeToggle{ m_TopDownView });
+            m_EventBus.Publish(ViewModeToggle{ m_TopDownView });
         }
         ImGui::SeparatorText("Track View");
         ImGui::SliderFloat("Zoom", &m_TrackZoom, 0.25f, 4.0f, "%.2f");
@@ -312,7 +318,7 @@ void RaceDashboardPanel::RenderSettingsPanel()
         ImGui::SliderFloat("Stroke Padding", &m_TrackPadding, 0.00f, 0.40f, "%.2f");
         if (ImGui::Checkbox("Lane Lines", &m_ShowLaneLines))
         {
-            Engine::g_Renderer->m_ShowLaneLines = m_ShowLaneLines;
+            m_Renderer.m_ShowLaneLines = m_ShowLaneLines;
         }
 
         ImGui::SeparatorText("Cars");

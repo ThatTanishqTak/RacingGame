@@ -50,6 +50,4 @@ namespace Engine
         float m_TrackHalfWidth{ 0.0f };
         ViewMode m_ViewMode{ ViewMode::View3D };
     };
-
-    extern Renderer* g_Renderer;
 }

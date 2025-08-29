@@ -15,25 +15,30 @@
 #include <glm/glm.hpp>
 #include <GLFW/glfw3.h>
 
+GameLayer::GameLayer(EventBus& eventBus, Engine::Renderer& renderer) : m_EventBus(eventBus), m_Renderer(renderer)
+{
+
+}
+
 void GameLayer::Update()
 {
     static bool s_TogglePressed = false;
     bool l_TabDown = !ImGui::GetIO().WantCaptureKeyboard && ImGui::IsKeyDown(ImGuiKey_Tab);
     if (l_TabDown && !s_TogglePressed)
     {
-        bool l_TopDown = Engine::g_Renderer->GetViewMode() == Engine::Renderer::ViewMode::View2DTopDown;
-        g_EventBus.Publish(ViewModeToggle{ !l_TopDown });
+        bool l_TopDown = m_Renderer.GetViewMode() == Engine::Renderer::ViewMode::View2DTopDown;
+        m_EventBus.Publish(ViewModeToggle{ !l_TopDown });
     }
     s_TogglePressed = l_TabDown;
 }
 
 void GameLayer::Render(const std::vector<std::string>& trackLayout)
 {
-    static RaceDashboardPanel l_Dashboard;
-    static TimingTowerPanel l_TimingTower;
-    static FlagPanel l_Flags;
-    static LeaderboardPanel l_Leaderboard;
-    static CarInspectorPanel l_Inspector;
+    static RaceDashboardPanel s_Dashboard(m_EventBus, m_Renderer);
+    static TimingTowerPanel s_TimingTower;
+    static FlagPanel s_Flags;
+    static LeaderboardPanel s_Leaderboard;
+    static CarInspectorPanel s_Inspector(m_Renderer);
 
     RaceState l_State;
     l_State.Date = "18-10-2025";
@@ -96,13 +101,8 @@ void GameLayer::Render(const std::vector<std::string>& trackLayout)
             }
         }
 
-        glm::vec2 l_MinBounds{ -5.0f, -10.0f };
-        glm::vec2 l_MaxBounds{ 5.0f, 10.0f };
-        if (Engine::g_Renderer)
-        {
-            l_MinBounds = Engine::g_Renderer->GetTrackMin();
-            l_MaxBounds = Engine::g_Renderer->GetTrackMax();
-        }
+        glm::vec2 l_MinBounds = m_Renderer.GetTrackMin();
+        glm::vec2 l_MaxBounds = m_Renderer.GetTrackMax();
 
         auto a_WorldToScreen = [&](const glm::vec3& p)
             {
@@ -123,9 +123,9 @@ void GameLayer::Render(const std::vector<std::string>& trackLayout)
     }
 #endif
 
-    l_Dashboard.Render(l_State);
-    l_TimingTower.Render(l_State);
-    l_Flags.Render(l_State);
-    l_Leaderboard.Render(l_State);
-    l_Inspector.Render(l_State);
+    s_Dashboard.Render(l_State);
+    s_TimingTower.Render(l_State);
+    s_Flags.Render(l_State);
+    s_Leaderboard.Render(l_State);
+    s_Inspector.Render(l_State);
 }

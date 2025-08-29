@@ -6,6 +6,7 @@
 
 class Driver;
 class Circuit;
+class EventBus;
 
 struct SessionResult
 {
@@ -33,7 +34,7 @@ public:
 
     std::vector<SessionResult> ConductPractice(const std::vector<std::shared_ptr<Driver>>& drivers);
     std::vector<SessionResult> ConductQualifying(const std::vector<std::shared_ptr<Driver>>& drivers);
-    std::vector<SessionResult> ConductRace(const std::vector<std::shared_ptr<Driver>>& drivers);
+    std::vector<SessionResult> ConductRace(const std::vector<std::shared_ptr<Driver>>& drivers, EventBus& eventBus);
 
     const std::vector<SessionResult>& GetPracticeResults() const;
     const std::vector<SessionResult>& GetQualifyingResults() const;

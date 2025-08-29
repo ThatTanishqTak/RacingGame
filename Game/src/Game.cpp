@@ -27,12 +27,16 @@ public:
     Game(const std::string& saveFile, const std::string& replayFile) : m_SaveFile(saveFile), m_ReplayFile(replayFile)
     {
         g_PaletteManager.LoadPalettes("Assets/Palettes/primary.json", "Assets/Palettes/colourblind.json");
-        g_EventBus.Subscribe<ViewModeToggle>([this](const ViewModeToggle& e)
+        m_EventBus.Subscribe<ViewModeToggle>([this](const ViewModeToggle& e)
             {
                 SetViewMode(e.TopDown ? Engine::Renderer::ViewMode::View2DTopDown : Engine::Renderer::ViewMode::View3D);
             });
     }
-    ~Game() = default;
+
+    ~Game()
+    {
+        g_EventBus.Unsubscribe(m_ViewModeToken);
+    }
 
     void Run() override
     {
@@ -50,7 +54,7 @@ public:
         std::vector<glm::vec2> l_PitLane = l_Circuit.GetCenterline();
         l_Track.SetPitLane(l_PitLane, 0.0f, 0.0f);
 
-        RaceController l_Controller(l_Track.GetLength(), 2, l_Start);
+        RaceController l_Controller(m_EventBus, l_Track.GetLength(), 2, l_Start);
         l_Controller.SetPitStrategy(0, 1);
         l_Controller.SetPitStrategy(1, 1);
 
@@ -74,7 +78,7 @@ public:
             }
         }
 
-        Engine::g_Renderer->SetTrackCenterline(l_Track.GetCenterline(), l_Circuit.GetHalfWidth());
+        m_Renderer->SetTrackCenterline(l_Track.GetCenterline(), l_Circuit.GetHalfWidth());
 
         Engine::CameraController l_CameraController;
         l_CameraController.Initialize(m_Camera.get());
@@ -83,10 +87,10 @@ public:
         l_CameraController.SetTrackBounds(l_MinBounds, l_MaxBounds);
         l_CameraController.SetCarPositionProvider([&l_Simulation](int id)
             {
-                const auto& l_Cars = l_Simulation.GetCars();
-                if (id >= 0 && id < (int)l_Cars.size())
+                const auto& a_Cars = l_Simulation.GetCars();
+                if (id >= 0 && id < (int)a_Cars.size())
                 {
-                    return glm::vec2(l_Cars[id].Position.x, l_Cars[id].Position.z);
+                    return glm::vec2(a_Cars[id].Position.x, a_Cars[id].Position.z);
                 }
 
                 return glm::vec2(0.0f);
@@ -94,7 +98,7 @@ public:
         l_CameraController.SetMode(Engine::CameraController::Mode::FitAll);
         bool l_SwitchedToFollow = false;
 
-        GameLayer l_Layer;
+        GameLayer l_Layer(m_EventBus, *m_Renderer);
         while (!m_Window->WindowShouldClose())
         {
             double l_CurrentTime = glfwGetTime();
@@ -145,9 +149,11 @@ public:
     }
 
 private:
+    EventBus m_EventBus;
     std::string m_SaveFile;
     std::string m_ReplayFile;
     ReplayLogger m_Logger;
+    int m_ViewModeToken = 0;
 };
 
 Engine::Application* Engine::CreateApplication(int argc, char** argv)

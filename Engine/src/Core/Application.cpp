@@ -23,7 +23,6 @@ namespace Engine
         {
             throw std::runtime_error("Failed to initialize the renderer");
         }
-        g_Renderer = m_Renderer.get();
 
         m_ImGuiLayer = std::make_unique<ImGuiLayer>();
         if (!m_ImGuiLayer->Initialize(m_Window->GetNativeWindow()))
@@ -37,8 +36,6 @@ namespace Engine
         m_ImGuiLayer->Shutdown();
         m_Renderer->Shutdown();
         m_Window->Shutdown();
-
-        g_Renderer = nullptr;
     }
 
     void Application::SetViewMode(Renderer::ViewMode mode)
