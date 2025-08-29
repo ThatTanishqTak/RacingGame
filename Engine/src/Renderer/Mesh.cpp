@@ -65,11 +65,11 @@ namespace Engine
         return std::make_shared<Mesh>(l_Vertices, l_Indices);
     }
 
-    std::shared_ptr<Mesh> Mesh::LoadFromFile(const std::string& l_Path)
+    std::shared_ptr<Mesh> Mesh::LoadFromFile(const std::string& path)
     {
         Assimp::Importer l_Importer;
         // Import the FBX file using Assimp
-        const aiScene* l_Scene = l_Importer.ReadFile(l_Path, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices);
+        const aiScene* l_Scene = l_Importer.ReadFile(path, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices);
         if (!l_Scene || !l_Scene->HasMeshes())
         {
             return nullptr;

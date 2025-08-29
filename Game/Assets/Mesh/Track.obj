@@ -1,0 +1,8 @@
+# Simple plane as track
+o Track
+v -5 0 -10
+v 5 0 -10
+v 5 0 10
+v -5 0 10
+f 1 2 3
+f 1 3 4

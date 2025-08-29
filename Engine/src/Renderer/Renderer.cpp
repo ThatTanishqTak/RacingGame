@@ -41,33 +41,54 @@ namespace Engine
         std::string l_Fragment = ReadFile("Assets/Shaders/Shader.frag");
         m_Shader = ShaderLibrary::Get().Load("Basic", l_Vertex, l_Fragment);
 
-        m_CarMesh = Mesh::CreateCube();
-
-        std::vector<float> l_TrackVertices =
+        // Load mesh paths from configuration file for easy swapping
+        std::string l_ConfigData = ReadFile("Assets/resources.cfg");
+        std::stringstream l_ConfigStream(l_ConfigData);
+        std::string l_Line;
+        while (std::getline(l_ConfigStream, l_Line))
         {
-            -5.0f, 0.0f, -10.0f,
-             5.0f, 0.0f, -10.0f,
-             5.0f, 0.0f,  10.0f,
-            -5.0f, 0.0f,  10.0f
-        };
+            size_t l_Delim = l_Line.find('=');
+            if (l_Delim == std::string::npos)
+            {
+                continue;
+            }
 
-        std::vector<uint32_t> l_TrackIndices = { 0, 1, 2, 2, 3, 0 };
-        m_TrackMesh = std::make_shared<Mesh>(l_TrackVertices, l_TrackIndices);
+            std::string l_Key = l_Line.substr(0, l_Delim);
+            std::string l_Value = l_Line.substr(l_Delim + 1);
+            if (l_Key == "CarMesh")
+            {
+                m_CarMeshPath = l_Value;
+            }
+
+            else if (l_Key == "TrackMesh")
+            {
+                m_TrackMeshPath = l_Value;
+            }
+        }
+
+        m_CarMesh = Mesh::LoadFromFile(m_CarMeshPath);
+        m_TrackMesh = Mesh::LoadFromFile(m_TrackMeshPath);
+
+        if (!m_CarMesh || !m_TrackMesh)
+        {
+            return false;
+        }
 
         m_TrackMin = { std::numeric_limits<float>::max(), std::numeric_limits<float>::max() };
         m_TrackMax = { std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest() };
         
         const auto& l_Vertices = m_TrackMesh->GetVertices();
-        for (size_t i = 0; i < l_Vertices.size(); i += 3)
+        for (size_t it_Index = 0; it_Index < l_Vertices.size(); it_Index += 3)
         {
-            float x = l_Vertices[i];
-            float z = l_Vertices[i + 2];
+            float l_X = l_Vertices[it_Index];
+            float l_Z = l_Vertices[it_Index + 2];
 
-            m_TrackMin.x = std::min(m_TrackMin.x, x);
-            m_TrackMin.y = std::min(m_TrackMin.y, z);
-            m_TrackMax.x = std::max(m_TrackMax.x, x);
-            m_TrackMax.y = std::max(m_TrackMax.y, z);
+            m_TrackMin.x = std::min(m_TrackMin.x, l_X);
+            m_TrackMin.y = std::min(m_TrackMin.y, l_Z);
+            m_TrackMax.x = std::max(m_TrackMax.x, l_X);
+            m_TrackMax.y = std::max(m_TrackMax.y, l_Z);
         }
+
 
         return true;
     }

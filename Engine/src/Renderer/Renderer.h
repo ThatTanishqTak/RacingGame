@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 #include <memory>
 #include <vector>
+#include <string>
 
 namespace Engine
 {
@@ -44,6 +45,8 @@ namespace Engine
         std::shared_ptr<Shader> m_Shader;
         std::shared_ptr<Mesh> m_CarMesh;
         std::shared_ptr<Mesh> m_TrackMesh;
+        std::string m_CarMeshPath{};
+        std::string m_TrackMeshPath{};
         glm::vec2 m_TrackMin{};
         glm::vec2 m_TrackMax{};
         std::vector<glm::vec2> m_TrackCenterline{};
