@@ -11,7 +11,7 @@ class Car
 private:
     std::string m_Model;
     std::optional<std::string> m_Sponsor;
-    std::shared_ptr<Driver> m_AssignedDriver;
+    std::weak_ptr<Driver> m_AssignedDriver;
 
 public:
     explicit Car(const std::string& model);

@@ -28,7 +28,7 @@ void Car::SetSponsor(const std::optional<std::string>& sponsor)
 
 std::shared_ptr<Driver> Car::GetAssignedDriver() const
 {
-	return m_AssignedDriver;
+	return m_AssignedDriver.lock();
 }
 
 void Car::SetAssignedDriver(const std::shared_ptr<Driver>& driver)
